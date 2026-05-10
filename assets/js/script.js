@@ -1,159 +1,104 @@
 
-let supabaseClient = null;
-if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
-  supabaseClient = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-}
+const supabaseClient = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
 
-async function syncFromSupabase(){
-  if (!supabaseClient) return;
-  try {
-    const { data: cfg } = await supabaseClient.from('site_config').select('*').eq('id',1).maybeSingle();
-    let local = {};
-    try { local = JSON.parse(localStorage.getItem('siteAdminData') || '{}'); } catch(e) {}
-    if (cfg) {
-      local.nome = cfg.nome_corretor || local.nome;
-      local.creci = cfg.creci || local.creci;
-      local.whatsapp = cfg.whatsapp || local.whatsapp;
-      if (cfg.titulo_principal && cfg.titulo_principal.includes('|')) {
-        const parts = cfg.titulo_principal.split('|');
-        local.heroTitle1 = parts[0];
-        local.heroTitle2 = parts[1];
-      }
-      local.heroSubtitle = cfg.subtitulo_principal || local.heroSubtitle;
-      local.contactSubtitle = cfg.texto_contato || local.contactSubtitle;
-      local.heroBg = cfg.banner_url || local.heroBg;
-    }
-    const { data: imoveis } = await supabaseClient.from('imoveis').select('*').eq('ativo', true).order('id');
-    if (imoveis && imoveis.length) {
-      local.properties = imoveis.map(i => ({
-        tag: i.destaque,
-        title: i.titulo,
-        location: i.localizacao,
-        details: i.detalhes || i.descricao,
-        price: i.preco,
-        image: i.imagem_url
-      }));
-    }
-    localStorage.setItem('siteAdminData', JSON.stringify(local));
-  } catch (e) {
-    console.warn('Erro ao sincronizar com Supabase', e);
-  }
-}
-
-document.addEventListener('DOMContentLoaded', async function(){
-  await syncFromSupabase();
-});
-
-
-// ===== Site Corretor Premium - Netlify Static Admin =====
-
-const DEFAULT_DATA = {
-  nome: "Ricardo Almeida",
+const DEFAULT_CONFIG = {
+  nome_corretor: "Ricardo Almeida",
   creci: "CRECI 123456-F",
   whatsapp: "5592986155502",
-  logoText: "RA",
-  heroEyebrow: "EXCLUSIVIDADE QUE TRANSFORMA",
-  heroTitle1: "Imóveis selecionados",
-  heroTitle2: "para uma vida extraordinária",
-  heroSubtitle: "Soluções imobiliárias personalizadas para quem busca exclusividade, segurança e os melhores investimentos.",
-  contactTitle: "Pronto para encontrar o imóvel ideal?",
-  contactSubtitle: "Solicite uma consultoria personalizada.",
-  heroBg: "",
-  properties: [
-    {tag:"DESTAQUE", title:"Casa no Alphaville", location:"Manaus/AM", details:"4 suítes • 6 banheiros • 450m²", price:"R$ 4.800.000", image:"assets/img/property-1.svg"},
-    {tag:"EXCLUSIVO", title:"Apartamento Vista Rio Negro", location:"Ponta Negra, Manaus/AM", details:"3 suítes • 4 banheiros • 210m²", price:"R$ 3.200.000", image:"assets/img/property-2.svg"},
-    {tag:"LANÇAMENTO", title:"Condomínio Reserva do Sol", location:"Tarumã, Manaus/AM", details:"5 suítes • 7 banheiros • 680m²", price:"R$ 6.900.000", image:"assets/img/property-3.svg"}
-  ]
+  logo_texto: "RA",
+  logo_url: "",
+  banner_url: "",
+  titulo_principal: "Imóveis selecionados|para uma vida extraordinária",
+  subtitulo_principal: "Soluções imobiliárias personalizadas para quem busca exclusividade, segurança e os melhores investimentos.",
+  texto_contato: "Solicite uma consultoria personalizada."
 };
 
-function getData(){
-  try {
-    return {...DEFAULT_DATA, ...(JSON.parse(localStorage.getItem("siteAdminData") || "{}"))};
-  } catch(e) {
-    return DEFAULT_DATA;
-  }
+function moneyNumber(v){
+  if(!v) return 0;
+  return parseFloat(String(v).replace(/[^\d,.-]/g,'').replace(/\./g,'').replace(',','.')) || 0;
 }
+function fmt(v){ return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"}); }
+function nums(v){ return String(v || "").replace(/\D/g,""); }
 
-function saveData(data){
-  localStorage.setItem("siteAdminData", JSON.stringify(data));
-}
+async function loadConfig(){
+  let config = DEFAULT_CONFIG;
+  const { data, error } = await supabaseClient.from("site_config").select("*").eq("id",1).maybeSingle();
+  if(data) config = {...config, ...data};
 
-function onlyNumbers(v){
-  return String(v || "").replace(/\D/g, "");
-}
+  const brandStrong = document.querySelectorAll(".brand strong");
+  brandStrong.forEach(el => el.textContent = (config.nome_corretor || "").toUpperCase());
 
-function brMoneyToNumber(v){
-  if (!v) return 0;
-  const cleaned = String(v).replace(/[^\d,.-]/g,"").replace(/\./g,"").replace(",", ".");
-  return parseFloat(cleaned) || 0;
-}
+  document.querySelectorAll(".brand small").forEach(el => el.textContent = `CORRETOR DE IMÓVEIS · ${config.creci || ""}`);
 
-function fmt(v){
-  return v.toLocaleString("pt-BR", {style:"currency", currency:"BRL"});
-}
+  document.querySelectorAll(".brand-mark").forEach(el => {
+    if(config.logo_url){
+      el.innerHTML = `<img src="${config.logo_url}" alt="Logo" style="width:100%;height:100%;object-fit:contain">`;
+    } else {
+      el.textContent = config.logo_texto || "RA";
+    }
+  });
 
-function applySiteData(){
-  const data = getData();
-
-  document.querySelectorAll(".brand strong").forEach(el => el.textContent = data.nome.toUpperCase());
-  document.querySelectorAll(".brand small").forEach(el => el.textContent = `CORRETOR DE IMÓVEIS · ${data.creci}`);
-  document.querySelectorAll(".brand-mark").forEach(el => el.textContent = data.logoText || "RA");
-
-  const heroEyebrow = document.querySelector(".hero .eyebrow");
-  if(heroEyebrow) heroEyebrow.textContent = data.heroEyebrow;
-
+  const titles = String(config.titulo_principal || DEFAULT_CONFIG.titulo_principal).split("|");
   const h1 = document.querySelector(".hero h1");
-  if(h1) h1.innerHTML = `${data.heroTitle1}<span>${data.heroTitle2}</span>`;
+  if(h1) h1.innerHTML = `${titles[0] || ""}<span>${titles[1] || ""}</span>`;
 
   const lead = document.querySelector(".hero .lead");
-  if(lead) lead.textContent = data.heroSubtitle;
-
-  const contactTitle = document.querySelector("#contato h2, .contact h2");
-  if(contactTitle) contactTitle.textContent = data.contactTitle;
-
-  const contactSubtitle = document.querySelector("#contato p, .contact p");
-  if(contactSubtitle) contactSubtitle.textContent = data.contactSubtitle;
+  if(lead) lead.textContent = config.subtitulo_principal || "";
 
   const heroBg = document.querySelector(".hero-bg");
-  if(heroBg && data.heroBg){
-    heroBg.style.background = `radial-gradient(circle at 75% 25%,#d8a84f30,transparent 24%),linear-gradient(90deg,#07101b 0%,#07101bee 35%,#07101b44 70%),url('${data.heroBg}') center/cover no-repeat`;
+  if(heroBg && config.banner_url){
+    heroBg.style.background = `radial-gradient(circle at 75% 25%,#d8a84f30,transparent 24%),linear-gradient(90deg,#07101b 0%,#07101bee 35%,#07101b44 70%),url('${config.banner_url}') center/cover no-repeat`;
   }
 
-  renderProperties(data.properties || []);
+  const contactSubtitle = document.querySelector("#contato p, .contact p");
+  if(contactSubtitle) contactSubtitle.textContent = config.texto_contato || "";
+
+  const whats = document.querySelectorAll('a[href*="wa.me"], .whatsapp');
+  whats.forEach(a => {
+    if(a.tagName === "A") a.href = `https://wa.me/${nums(config.whatsapp)}`;
+  });
+
+  return config;
 }
 
-function renderProperties(properties){
+async function loadProperties(){
+  const { data, error } = await supabaseClient.from("imoveis").select("*").eq("ativo",true).order("id",{ascending:true});
   const grid = document.querySelector(".property-grid");
-  if(!grid) return;
-  grid.innerHTML = properties.map((p, i) => `
+  if(!grid || !data) return;
+
+  grid.innerHTML = data.map(p => `
     <article class="property-card reveal visible">
-      <div class="property-img" style="background-image:url('${p.image || "assets/img/property-1.svg"}')">
-        <span>${p.tag || "DESTAQUE"}</span>
+      <div class="property-img" style="background-image:url('${p.imagem_url || "assets/img/property-1.svg"}')">
+        <span>${p.destaque || p.status || "DESTAQUE"}</span>
       </div>
       <div class="property-body">
-        <h3>${p.title || "Imóvel sem título"}</h3>
-        <p>${p.location || ""}</p>
-        <small>${p.details || ""}</small>
-        <strong>${p.price || ""}</strong>
+        <h3>${p.titulo || ""}</h3>
+        <p>${p.localizacao || ""}</p>
+        <small>
+          ${p.tipo ? p.tipo + " • " : ""}
+          ${p.quartos ? p.quartos + " quartos • " : ""}
+          ${p.banheiros ? p.banheiros + " banheiros • " : ""}
+          ${p.vagas ? p.vagas + " vagas • " : ""}
+          ${p.area_m2 ? p.area_m2 + "m²" : (p.detalhes || "")}
+        </small>
+        <strong>${p.preco || ""}</strong>
       </div>
     </article>
   `).join("");
 }
 
-function setupContact(){
+function setupContact(config){
   const form = document.querySelector(".contact-form");
   if(!form) return;
-  form.addEventListener("submit", function(e){
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
-
     const fields = form.querySelectorAll("input, textarea");
-    const nome = fields[0]?.value.trim() || "";
-    const clienteWhatsapp = fields[1]?.value.trim() || "";
-    const assunto = fields[2]?.value.trim() || "";
-    const mensagem = fields[3]?.value.trim() || "";
+    const nome = fields[0]?.value || "";
+    const whatsapp = fields[1]?.value || "";
+    const interesse = fields[2]?.value || "";
+    const mensagem = fields[3]?.value || "";
 
-    const data = getData();
-    const corretorWhatsapp = onlyNumbers(data.whatsapp || DEFAULT_DATA.whatsapp);
+    await supabaseClient.from("mensagens_contato").insert({nome, whatsapp, interesse, mensagem});
 
     let box = document.getElementById("contact-success");
     if(!box){
@@ -164,27 +109,26 @@ function setupContact(){
     }
     box.textContent = "Sua mensagem foi enviada para o corretor, assim que possível retornaremos em seu WhatsApp!";
 
-    const texto = `Olá, sou ${nome}.%0AWhatsApp: ${clienteWhatsapp}%0AAssunto: ${assunto}%0AMensagem: ${mensagem}`;
-    const url = `https://wa.me/${corretorWhatsapp}?text=${texto}`;
-    window.open(url, "_blank");
+    const text = encodeURIComponent(`Nova mensagem do site:\nNome: ${nome}\nWhatsApp: ${whatsapp}\nInteresse: ${interesse}\nMensagem: ${mensagem}`);
+    window.open(`https://wa.me/${nums(config.whatsapp)}?text=${text}`, "_blank");
+    form.reset();
   });
 }
 
 function setupFinance(){
   const form = document.querySelector(".finance-form");
   if(!form) return;
-  form.addEventListener("submit", function(e){
+  form.addEventListener("submit", (e) => {
     e.preventDefault();
     const fields = form.querySelectorAll("input, select");
-    const valorImovel = brMoneyToNumber(fields[0]?.value);
-    const entrada = brMoneyToNumber(fields[1]?.value);
+    const valor = moneyNumber(fields[0]?.value);
+    const entrada = moneyNumber(fields[1]?.value);
     const prazo = parseInt(fields[2]?.value || fields[2]?.selectedOptions?.[0]?.textContent || "360") || 360;
-
-    const valorFinanciado = Math.max(valorImovel - entrada, 0);
-    const taxaMensal = 0.009;
-    const parcela = valorFinanciado > 0 ? (valorFinanciado * taxaMensal) / (1 - Math.pow(1 + taxaMensal, -prazo)) : 0;
+    const financiado = Math.max(valor - entrada, 0);
+    const taxa = 0.009;
+    const parcela = financiado ? (financiado * taxa) / (1 - Math.pow(1 + taxa, -prazo)) : 0;
     const total = parcela * prazo;
-    const juros = Math.max(total - valorFinanciado, 0);
+    const juros = total - financiado;
 
     let res = document.getElementById("finance-result");
     if(!res){
@@ -193,25 +137,22 @@ function setupFinance(){
       res.style.cssText = "margin-top:16px;padding:16px;border:1px solid #ffffff18;background:#060b11;border-radius:8px;line-height:1.8";
       form.appendChild(res);
     }
-    res.innerHTML = `
-      <strong style="color:#d8a84f">Resultado da simulação</strong><br>
-      Valor do imóvel: <strong>${fmt(valorImovel)}</strong><br>
+    res.innerHTML = `<strong style="color:#d8a84f">Resultado da simulação</strong><br>
+      Valor do imóvel: <strong>${fmt(valor)}</strong><br>
       Entrada: <strong>${fmt(entrada)}</strong><br>
-      Valor financiado: <strong>${fmt(valorFinanciado)}</strong><br>
+      Valor financiado: <strong>${fmt(financiado)}</strong><br>
       Prazo: <strong>${prazo} meses</strong><br>
-      Taxa estimada: <strong>0,9% ao mês</strong><br>
       Parcela estimada: <strong style="color:#f1c978">${fmt(parcela)}</strong><br>
       Total estimado: <strong>${fmt(total)}</strong><br>
-      Juros estimados: <strong>${fmt(juros)}</strong>
-      <small style="display:block;color:#b8c0cc;margin-top:8px">Simulação aproximada. Consulte o banco para valores oficiais.</small>
-    `;
+      Juros estimados: <strong>${fmt(Math.max(juros,0))}</strong>
+      <small style="display:block;color:#b8c0cc;margin-top:8px">Simulação aproximada. Consulte o banco para valores oficiais.</small>`;
   });
 }
 
-document.addEventListener("DOMContentLoaded", function(){
-  applySiteData();
-  setupContact();
-  setupFinance();
-
+document.addEventListener("DOMContentLoaded", async () => {
   document.querySelectorAll('a[href="#depoimentos"]').forEach(a => a.remove());
+  const config = await loadConfig();
+  await loadProperties();
+  setupContact(config);
+  setupFinance();
 });

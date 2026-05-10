@@ -3,288 +3,338 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Área do Corretor</title>
+<title>Painel do Corretor</title>
 <link rel="stylesheet" href="assets/css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/supabase-config.js"></script>
 <style>
-body{padding:30px;background:#070b10;color:#f7f4ee}
-.admin-wrap{max-width:1180px;margin:0 auto}
-.admin-card{background:#101720;border:1px solid #ffffff18;border-radius:14px;padding:26px;box-shadow:0 28px 70px #0009;margin-bottom:22px}
-.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-label{display:block;margin:12px 0 6px;color:#f1c978;font-weight:800;font-size:13px}
-input,textarea{width:100%;padding:13px;background:#060b11;color:#fff;border:1px solid #ffffff18;border-radius:6px}
+body{padding:28px;background:#070b10;color:#f7f4ee}
+.admin-wrap{max-width:1220px;margin:0 auto}
+.admin-card{background:#101720;border:1px solid #ffffff18;border-radius:14px;padding:24px;box-shadow:0 28px 70px #0009;margin-bottom:20px}
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.admin-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+label{display:block;margin:10px 0 6px;color:#f1c978;font-weight:800;font-size:13px}
+input,textarea,select{width:100%;padding:13px;background:#060b11;color:#fff;border:1px solid #ffffff18;border-radius:6px}
 textarea{min-height:90px}
-.hidden{display:none}
+.hidden{display:none!important}
 .admin-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
 .property-editor{border:1px solid #ffffff18;padding:16px;border-radius:10px;margin:14px 0;background:#0b1119}
 .property-editor h3{margin-top:0;color:#f1c978}
 .notice{padding:14px;background:#060b11;border:1px solid #d8a84f55;border-radius:8px;color:#f1c978;margin:12px 0}
-@media(max-width:800px){.admin-grid{grid-template-columns:1fr}}
+.stat{background:#060b11;border:1px solid #ffffff18;border-radius:12px;padding:18px}
+.stat strong{font-size:34px;color:#f1c978;display:block}
+.message{border-bottom:1px solid #ffffff18;padding:14px 0}
+.preview-img{max-width:180px;max-height:100px;border-radius:8px;margin-top:8px;border:1px solid #ffffff18;object-fit:cover}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}
+.tabs button{border:1px solid #ffffff18;background:#060b11;color:#fff;padding:12px 18px;border-radius:8px;font-weight:800;cursor:pointer}
+.tabs button.active{background:linear-gradient(135deg,#d8a84f,#f1c978);color:#14100a}
+@media(max-width:850px){.admin-grid,.admin-grid-3{grid-template-columns:1fr}}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="assets/js/supabase-config.js"></script>
 </head>
 <body>
 <div class="admin-wrap">
-
   <div class="admin-card" id="loginBox">
     <h1>Painel do Corretor</h1>
-    <p>Entre para editar as informações exibidas no site.</p>
-    <label>Usuário</label>
-    <input id="user" value="admin">
-    <label>Senha</label>
-    <input id="pass" type="password" value="admin123">
+    <p>Entre com o e-mail e senha cadastrados no Supabase Auth.</p>
+    <label>E-mail</label><input id="email" type="email" placeholder="seu@email.com">
+    <label>Senha</label><input id="senha" type="password" placeholder="sua senha">
     <div class="admin-actions">
-      <button class="btn primary" onclick="login()">Entrar</button>
+      <button class="btn primary" onclick="entrar()">Entrar</button>
+      <button class="btn ghost" onclick="criarConta()">Criar primeiro acesso</button>
       <a class="btn ghost" href="index.html">Voltar ao site</a>
     </div>
+    <div class="notice">Para o primeiro uso, clique em “Criar primeiro acesso”. Depois use “Entrar”.</div>
   </div>
 
-  <div class="hidden" id="panel">
+  <div id="panel" class="hidden">
     <div class="admin-card">
       <h1>Painel do Corretor</h1>
-      <div class="notice">As alterações ficam salvas neste navegador. Para banco de dados online, será necessário integrar Firebase ou Supabase.</div>
       <div class="admin-actions">
-        <button class="btn primary" onclick="salvarTudo()">Salvar Tudo</button>
-        <button class="btn ghost" onclick="resetar()">Restaurar padrão</button>
+        <button class="btn primary" onclick="salvarConfig()">Salvar Configurações</button>
+        <button class="btn ghost" onclick="sair()">Sair</button>
         <a class="btn ghost" href="index.html">Ver Site</a>
       </div>
-    </div>
-
-    <div class="admin-card">
-      <h2>Identidade do corretor</h2>
-      <div class="admin-grid">
-        <div><label>Nome do corretor</label><input id="nome"></div>
-        <div><label>CRECI</label><input id="creci"></div>
-        <div><label>WhatsApp do corretor</label><input id="whatsapp" placeholder="5592999999999"></div>
-        <div><label>Texto da logo</label><input id="logoText" placeholder="RA"></div>
+      <div class="tabs">
+        <button class="active" onclick="showTab('dashboard',this)">Dashboard</button>
+        <button onclick="showTab('config',this)">Configurações</button>
+        <button onclick="showTab('imoveis',this)">Imóveis</button>
+        <button onclick="showTab('mensagens',this)">Mensagens</button>
       </div>
     </div>
 
-    <div class="admin-card">
-      <h2>Banner principal</h2>
-      <label>Frase pequena acima do título</label><input id="heroEyebrow">
-      <div class="admin-grid">
-        <div><label>Título linha 1</label><input id="heroTitle1"></div>
-        <div><label>Título linha 2</label><input id="heroTitle2"></div>
+    <section id="tab-dashboard">
+      <div class="admin-grid-3">
+        <div class="stat"><strong id="statImoveis">0</strong>Imóveis ativos</div>
+        <div class="stat"><strong id="statMensagens">0</strong>Mensagens recebidas</div>
+        <div class="stat"><strong id="statConfig">OK</strong>Supabase conectado</div>
       </div>
-      <label>Texto do banner</label><textarea id="heroSubtitle"></textarea>
-      <label>Imagem de fundo do banner/área principal em Base64 ou URL</label>
-      <input id="heroBg" placeholder="Cole uma URL de imagem ou base64">
-      <label>Carregar imagem de fundo</label>
-      <input type="file" accept="image/*" onchange="fileToInput(this,'heroBg')">
-    </div>
+    </section>
 
-    <div class="admin-card">
-      <h2>Contato</h2>
-      <label>Título da seção contato</label><input id="contactTitle">
-      <label>Subtítulo da seção contato</label><input id="contactSubtitle">
-    </div>
+    <section id="tab-config" class="hidden">
+      <div class="admin-card">
+        <h2>Identidade e textos</h2>
+        <div class="admin-grid">
+          <div><label>Nome do corretor</label><input id="nome_corretor"></div>
+          <div><label>CRECI</label><input id="creci"></div>
+          <div><label>WhatsApp</label><input id="whatsapp" placeholder="5592999999999"></div>
+          <div><label>Texto da logo</label><input id="logo_texto" placeholder="RA"></div>
+        </div>
+        <label>Logo do corretor</label>
+        <input type="file" id="logo_file" accept="image/*" onchange="uploadAndSet(this,'logos','logo_url')">
+        <input id="logo_url" placeholder="URL da logo">
+        <img id="logo_preview" class="preview-img hidden">
+        <label>Banner/imagem de fundo</label>
+        <input type="file" id="banner_file" accept="image/*" onchange="uploadAndSet(this,'banners','banner_url')">
+        <input id="banner_url" placeholder="URL do banner">
+        <img id="banner_preview" class="preview-img hidden">
+        <div class="admin-grid">
+          <div><label>Título principal - linha 1</label><input id="titulo_linha1"></div>
+          <div><label>Título principal - linha 2</label><input id="titulo_linha2"></div>
+        </div>
+        <label>Subtítulo principal</label><textarea id="subtitulo_principal"></textarea>
+        <label>Texto da área de contato</label><input id="texto_contato">
+      </div>
+    </section>
 
-    <div class="admin-card">
-      <h2>Imóveis do Portfólio</h2>
-      <div id="propertiesBox"></div>
-      <button class="btn primary" onclick="addProperty()">Adicionar imóvel</button>
-    </div>
+    <section id="tab-imoveis" class="hidden">
+      <div class="admin-card">
+        <h2>Cadastro de imóveis</h2>
+        <button class="btn primary" onclick="novoImovel()">Adicionar imóvel</button>
+        <div id="propertiesBox"></div>
+      </div>
+    </section>
+
+    <section id="tab-mensagens" class="hidden">
+      <div class="admin-card">
+        <h2>Mensagens recebidas</h2>
+        <div id="messagesBox"></div>
+      </div>
+    </section>
   </div>
 </div>
 
 <script>
-const DEFAULT_DATA = {
-  nome: "Ricardo Almeida",
-  creci: "CRECI 123456-F",
-  whatsapp: "5592986155502",
-  logoText: "RA",
-  heroEyebrow: "EXCLUSIVIDADE QUE TRANSFORMA",
-  heroTitle1: "Imóveis selecionados",
-  heroTitle2: "para uma vida extraordinária",
-  heroSubtitle: "Soluções imobiliárias personalizadas para quem busca exclusividade, segurança e os melhores investimentos.",
-  contactTitle: "Pronto para encontrar o imóvel ideal?",
-  contactSubtitle: "Solicite uma consultoria personalizada.",
-  heroBg: "",
-  properties: [
-    {tag:"DESTAQUE", title:"Casa no Alphaville", location:"Manaus/AM", details:"4 suítes • 6 banheiros • 450m²", price:"R$ 4.800.000", image:"assets/img/property-1.svg"},
-    {tag:"EXCLUSIVO", title:"Apartamento Vista Rio Negro", location:"Ponta Negra, Manaus/AM", details:"3 suítes • 4 banheiros • 210m²", price:"R$ 3.200.000", image:"assets/img/property-2.svg"},
-    {tag:"LANÇAMENTO", title:"Condomínio Reserva do Sol", location:"Tarumã, Manaus/AM", details:"5 suítes • 7 banheiros • 680m²", price:"R$ 6.900.000", image:"assets/img/property-3.svg"}
-  ]
+const supabaseClient = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+
+const DEFAULT_CONFIG = {
+  id:1, nome_corretor:"Ricardo Almeida", creci:"CRECI 123456-F", whatsapp:"5592986155502",
+  logo_texto:"RA", logo_url:"", banner_url:"",
+  titulo_principal:"Imóveis selecionados|para uma vida extraordinária",
+  subtitulo_principal:"Soluções imobiliárias personalizadas para quem busca exclusividade, segurança e os melhores investimentos.",
+  texto_contato:"Solicite uma consultoria personalizada."
 };
-let data = {...DEFAULT_DATA, ...(JSON.parse(localStorage.getItem("siteAdminData") || "{}"))};
 
-function login(){
-  if(user.value === "admin" && pass.value === "admin123"){
-    loginBox.classList.add("hidden");
-    panel.classList.remove("hidden");
-    carregarCampos();
-  } else {
-    alert("Usuário ou senha inválidos.");
-  }
+let config = {...DEFAULT_CONFIG};
+let imoveis = [];
+
+function showTab(name, btn){
+  document.querySelectorAll("section[id^='tab-']").forEach(s=>s.classList.add("hidden"));
+  document.getElementById("tab-"+name).classList.remove("hidden");
+  document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
 }
 
-function carregarCampos(){
-  for(const k of ["nome","creci","whatsapp","logoText","heroEyebrow","heroTitle1","heroTitle2","heroSubtitle","heroBg","contactTitle","contactSubtitle"]){
-    document.getElementById(k).value = data[k] || "";
-  }
-  renderPropertiesAdmin();
+async function criarConta(){
+  const { error } = await supabaseClient.auth.signUp({email: email.value, password: senha.value});
+  if(error) return alert("Erro ao criar acesso: " + error.message);
+  alert("Acesso criado. Se o Supabase pedir confirmação por e-mail, confirme antes de entrar.");
 }
 
-function lerCampos(){
-  for(const k of ["nome","creci","whatsapp","logoText","heroEyebrow","heroTitle1","heroTitle2","heroSubtitle","heroBg","contactTitle","contactSubtitle"]){
-    data[k] = document.getElementById(k).value;
-  }
-  data.properties = [...document.querySelectorAll(".property-editor")].map(box => ({
-    tag: box.querySelector(".p-tag").value,
-    title: box.querySelector(".p-title").value,
-    location: box.querySelector(".p-location").value,
-    details: box.querySelector(".p-details").value,
-    price: box.querySelector(".p-price").value,
-    image: box.querySelector(".p-image").value
-  }));
+async function entrar(){
+  const { error } = await supabaseClient.auth.signInWithPassword({email: email.value, password: senha.value});
+  if(error) return alert("Erro ao entrar: " + error.message);
+  loginBox.classList.add("hidden");
+  panel.classList.remove("hidden");
+  await carregarTudo();
 }
 
-function salvarTudo(){
-  lerCampos();
-  localStorage.setItem("siteAdminData", JSON.stringify(data));
-  alert("Alterações salvas com sucesso!");
+async function sair(){
+  await supabaseClient.auth.signOut();
+  location.reload();
 }
 
-function resetar(){
-  if(confirm("Deseja restaurar as informações padrão?")){
-    localStorage.removeItem("siteAdminData");
-    data = JSON.parse(JSON.stringify(DEFAULT_DATA));
-    carregarCampos();
-  }
+async function carregarTudo(){
+  await carregarConfig();
+  await carregarImoveis();
+  await carregarMensagens();
+  atualizarStats();
 }
 
-function addProperty(){
-  data.properties.push({tag:"NOVO", title:"Novo Imóvel", location:"Manaus/AM", details:"3 suítes • 2 vagas • 200m²", price:"R$ 900.000", image:"assets/img/property-1.svg"});
-  renderPropertiesAdmin();
+async function carregarConfig(){
+  const { data } = await supabaseClient.from("site_config").select("*").eq("id",1).maybeSingle();
+  config = {...DEFAULT_CONFIG, ...(data || {})};
+  nome_corretor.value = config.nome_corretor || "";
+  creci.value = config.creci || "";
+  whatsapp.value = config.whatsapp || "";
+  logo_texto.value = config.logo_texto || "";
+  logo_url.value = config.logo_url || "";
+  banner_url.value = config.banner_url || "";
+  const parts = String(config.titulo_principal || "").split("|");
+  titulo_linha1.value = parts[0] || "";
+  titulo_linha2.value = parts[1] || "";
+  subtitulo_principal.value = config.subtitulo_principal || "";
+  texto_contato.value = config.texto_contato || "";
+  preview("logo_preview", logo_url.value);
+  preview("banner_preview", banner_url.value);
 }
 
-function removeProperty(i){
-  data.properties.splice(i,1);
-  renderPropertiesAdmin();
+async function salvarConfig(){
+  const payload = {
+    id:1,
+    nome_corretor:nome_corretor.value,
+    creci:creci.value,
+    whatsapp:whatsapp.value,
+    logo_texto:logo_texto.value,
+    logo_url:logo_url.value,
+    banner_url:banner_url.value,
+    titulo_principal:`${titulo_linha1.value}|${titulo_linha2.value}`,
+    subtitulo_principal:subtitulo_principal.value,
+    texto_contato:texto_contato.value,
+    updated_at:new Date().toISOString()
+  };
+  const { error } = await supabaseClient.from("site_config").upsert(payload);
+  if(error) return alert("Erro ao salvar: " + error.message);
+  alert("Configurações salvas com sucesso!");
 }
 
-function renderPropertiesAdmin(){
-  propertiesBox.innerHTML = data.properties.map((p,i)=>`
+async function carregarImoveis(){
+  const { data } = await supabaseClient.from("imoveis").select("*").order("id",{ascending:true});
+  imoveis = data || [];
+  renderImoveis();
+}
+
+function renderImoveis(){
+  propertiesBox.innerHTML = imoveis.map((p,i)=>`
     <div class="property-editor">
-      <h3>Imóvel ${i+1}</h3>
-      <div class="admin-grid">
-        <div><label>Selo</label><input class="p-tag" value="${p.tag || ""}"></div>
-        <div><label>Título</label><input class="p-title" value="${p.title || ""}"></div>
-        <div><label>Localização</label><input class="p-location" value="${p.location || ""}"></div>
-        <div><label>Preço</label><input class="p-price" value="${p.price || ""}"></div>
+      <h3>${p.id ? "Editar imóvel #" + p.id : "Novo imóvel"}</h3>
+      <div class="admin-grid-3">
+        <div><label>Título</label><input data-i="${i}" data-k="titulo" value="${p.titulo || ""}"></div>
+        <div><label>Localização</label><input data-i="${i}" data-k="localizacao" value="${p.localizacao || ""}"></div>
+        <div><label>Preço</label><input data-i="${i}" data-k="preco" value="${p.preco || ""}"></div>
+        <div><label>Tipo</label><input data-i="${i}" data-k="tipo" value="${p.tipo || ""}"></div>
+        <div><label>Status</label><input data-i="${i}" data-k="status" value="${p.status || "Venda"}"></div>
+        <div><label>Destaque/Selo</label><input data-i="${i}" data-k="destaque" value="${p.destaque || ""}"></div>
+        <div><label>Área m²</label><input data-i="${i}" data-k="area_m2" type="number" value="${p.area_m2 || ""}"></div>
+        <div><label>Quartos</label><input data-i="${i}" data-k="quartos" type="number" value="${p.quartos || ""}"></div>
+        <div><label>Banheiros</label><input data-i="${i}" data-k="banheiros" type="number" value="${p.banheiros || ""}"></div>
+        <div><label>Vagas</label><input data-i="${i}" data-k="vagas" type="number" value="${p.vagas || ""}"></div>
+        <div><label>Código</label><input data-i="${i}" data-k="codigo" value="${p.codigo || ""}"></div>
+        <div><label>Ativo</label><select data-i="${i}" data-k="ativo"><option value="true" ${p.ativo !== false ? "selected":""}>Sim</option><option value="false" ${p.ativo === false ? "selected":""}>Não</option></select></div>
       </div>
-      <label>Detalhes</label><input class="p-details" value="${p.details || ""}">
-      <label>Imagem do imóvel em Base64 ou URL</label><input class="p-image" value="${p.image || ""}">
-      <label>Carregar imagem do imóvel</label><input type="file" accept="image/*" onchange="fileToProperty(this,${i})">
-      <div class="admin-actions"><button class="btn ghost" onclick="removeProperty(${i})">Remover imóvel</button></div>
+      <label>Descrição</label><textarea data-i="${i}" data-k="descricao">${p.descricao || ""}</textarea>
+      <label>Detalhes curtos</label><input data-i="${i}" data-k="detalhes" value="${p.detalhes || ""}">
+      <label>Imagem</label>
+      <input type="file" accept="image/*" onchange="uploadImagemImovel(this,${i})">
+      <input data-i="${i}" data-k="imagem_url" value="${p.imagem_url || ""}" placeholder="URL da imagem">
+      ${p.imagem_url ? `<img src="${p.imagem_url}" class="preview-img">` : ""}
+      <div class="admin-actions">
+        <button class="btn primary" onclick="salvarImovel(${i})">Salvar imóvel</button>
+        ${p.id ? `<button class="btn ghost" onclick="excluirImovel(${p.id})">Excluir</button>` : ""}
+      </div>
     </div>
   `).join("");
 }
 
-function fileToInput(input, targetId){
-  const file = input.files[0]; if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => document.getElementById(targetId).value = e.target.result;
-  reader.readAsDataURL(file);
+function novoImovel(){
+  imoveis.unshift({ativo:true,status:"Venda",destaque:"NOVO"});
+  renderImoveis();
 }
 
-function fileToProperty(input, i){
-  const file = input.files[0]; if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    document.querySelectorAll(".property-editor")[i].querySelector(".p-image").value = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-</script>
-
-<script>
-const supabaseClient = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-
-async function salvarNoSupabase(data){
-  await supabaseClient.from('site_config').upsert({
-    id: 1,
-    nome_corretor: data.nome,
-    creci: data.creci,
-    whatsapp: data.whatsapp,
-    titulo_principal: data.heroTitle1 + '|' + data.heroTitle2,
-    subtitulo_principal: data.heroSubtitle,
-    texto_contato: data.contactSubtitle,
-    banner_url: data.heroBg
+function readImovelFromForm(i){
+  const box = document.querySelectorAll(".property-editor")[i];
+  const obj = {...imoveis[i]};
+  box.querySelectorAll("[data-k]").forEach(el=>{
+    let v = el.value;
+    if(["area_m2","quartos","banheiros","vagas"].includes(el.dataset.k)) v = v ? Number(v) : null;
+    if(el.dataset.k === "ativo") v = v === "true";
+    obj[el.dataset.k] = v;
   });
-
-  await supabaseClient.from('imoveis').delete().neq('id', 0);
-  for (const p of data.properties || []) {
-    await supabaseClient.from('imoveis').insert({
-      titulo: p.title,
-      localizacao: p.location,
-      descricao: p.details,
-      preco: p.price,
-      detalhes: p.details,
-      imagem_url: p.image,
-      destaque: p.tag,
-      ativo: true
-    });
-  }
+  return obj;
 }
 
-const _salvarTudoOriginal = salvarTudo;
-salvarTudo = async function(){
-  lerCampos();
-  localStorage.setItem("siteAdminData", JSON.stringify(data));
-  try {
-    await salvarNoSupabase(data);
-    alert("Alterações salvas com sucesso no Supabase e no navegador!");
-  } catch (e) {
-    console.error(e);
-    alert("As alterações foram salvas no navegador, mas ocorreu um erro ao enviar para o Supabase.");
+async function salvarImovel(i){
+  const obj = readImovelFromForm(i);
+  const payload = {
+    titulo:obj.titulo, localizacao:obj.localizacao, descricao:obj.descricao, preco:obj.preco,
+    detalhes:obj.detalhes, imagem_url:obj.imagem_url, destaque:obj.destaque, ativo:obj.ativo,
+    tipo:obj.tipo, area_m2:obj.area_m2, quartos:obj.quartos, banheiros:obj.banheiros,
+    vagas:obj.vagas, codigo:obj.codigo, status:obj.status
+  };
+  let error;
+  if(obj.id){
+    ({error} = await supabaseClient.from("imoveis").update(payload).eq("id", obj.id));
+  } else {
+    ({error} = await supabaseClient.from("imoveis").insert(payload));
   }
-};
-
-async function carregarDoSupabase(){
-  try {
-    const { data: cfg } = await supabaseClient.from('site_config').select('*').eq('id',1).maybeSingle();
-    if (cfg) {
-      data.nome = cfg.nome_corretor || data.nome;
-      data.creci = cfg.creci || data.creci;
-      data.whatsapp = cfg.whatsapp || data.whatsapp;
-      if (cfg.titulo_principal && cfg.titulo_principal.includes('|')) {
-        const parts = cfg.titulo_principal.split('|');
-        data.heroTitle1 = parts[0] || data.heroTitle1;
-        data.heroTitle2 = parts[1] || data.heroTitle2;
-      }
-      data.heroSubtitle = cfg.subtitulo_principal || data.heroSubtitle;
-      data.contactSubtitle = cfg.texto_contato || data.contactSubtitle;
-      data.heroBg = cfg.banner_url || data.heroBg;
-    }
-
-    const { data: imoveis } = await supabaseClient.from('imoveis').select('*').eq('ativo', true).order('id');
-    if (imoveis && imoveis.length) {
-      data.properties = imoveis.map(i => ({
-        tag: i.destaque,
-        title: i.titulo,
-        location: i.localizacao,
-        details: i.detalhes || i.descricao,
-        price: i.preco,
-        image: i.imagem_url
-      }));
-    }
-
-    localStorage.setItem("siteAdminData", JSON.stringify(data));
-  } catch (e) {
-    console.warn("Não foi possível carregar dados do Supabase.", e);
-  }
+  if(error) return alert("Erro ao salvar imóvel: " + error.message);
+  alert("Imóvel salvo!");
+  await carregarImoveis();
+  atualizarStats();
 }
 
-const _loginOriginal = login;
-login = async function(){
-  if(user.value === "admin" && pass.value === "admin123"){
-    await carregarDoSupabase();
+async function excluirImovel(id){
+  if(!confirm("Excluir este imóvel?")) return;
+  const { error } = await supabaseClient.from("imoveis").delete().eq("id",id);
+  if(error) return alert("Erro ao excluir: " + error.message);
+  await carregarImoveis();
+  atualizarStats();
+}
+
+async function uploadAndSet(input,bucket,target){
+  const url = await uploadFile(input,bucket);
+  if(!url) return;
+  document.getElementById(target).value = url;
+  preview(target.replace("_url","_preview"), url);
+}
+
+async function uploadImagemImovel(input,i){
+  const url = await uploadFile(input,"imoveis");
+  if(!url) return;
+  const box = document.querySelectorAll(".property-editor")[i];
+  box.querySelector('[data-k="imagem_url"]').value = url;
+}
+
+async function uploadFile(input,bucket){
+  const file = input.files[0]; if(!file) return "";
+  const ext = file.name.split(".").pop();
+  const path = `${Date.now()}-${Math.random().toString(16).slice(2)}.${ext}`;
+  const { error } = await supabaseClient.storage.from(bucket).upload(path,file,{upsert:true});
+  if(error){ alert("Erro no upload: " + error.message); return ""; }
+  const { data } = supabaseClient.storage.from(bucket).getPublicUrl(path);
+  return data.publicUrl;
+}
+
+function preview(id,url){
+  const img = document.getElementById(id);
+  if(!img) return;
+  if(url){ img.src=url; img.classList.remove("hidden"); } else img.classList.add("hidden");
+}
+
+async function carregarMensagens(){
+  const { data } = await supabaseClient.from("mensagens_contato").select("*").order("created_at",{ascending:false}).limit(50);
+  const msgs = data || [];
+  messagesBox.innerHTML = msgs.length ? msgs.map(m=>`
+    <div class="message">
+      <strong>${m.nome || "Sem nome"}</strong> · ${m.whatsapp || ""}
+      <p><b>Interesse:</b> ${m.interesse || ""}</p>
+      <p>${m.mensagem || ""}</p>
+      <small>${m.created_at ? new Date(m.created_at).toLocaleString("pt-BR") : ""}</small>
+    </div>
+  `).join("") : "<p>Nenhuma mensagem recebida ainda.</p>";
+  statMensagens.textContent = msgs.length;
+}
+
+function atualizarStats(){
+  statImoveis.textContent = imoveis.filter(i=>i.ativo !== false).length;
+}
+
+supabaseClient.auth.getSession().then(async ({data})=>{
+  if(data.session){
+    loginBox.classList.add("hidden");
+    panel.classList.remove("hidden");
+    await carregarTudo();
   }
-  _loginOriginal();
-};
+});
 </script>
-
 </body>
 </html>
