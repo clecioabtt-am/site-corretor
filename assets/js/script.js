@@ -1,4 +1,50 @@
 
+let supabaseClient = null;
+if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+  supabaseClient = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+}
+
+async function syncFromSupabase(){
+  if (!supabaseClient) return;
+  try {
+    const { data: cfg } = await supabaseClient.from('site_config').select('*').eq('id',1).maybeSingle();
+    let local = {};
+    try { local = JSON.parse(localStorage.getItem('siteAdminData') || '{}'); } catch(e) {}
+    if (cfg) {
+      local.nome = cfg.nome_corretor || local.nome;
+      local.creci = cfg.creci || local.creci;
+      local.whatsapp = cfg.whatsapp || local.whatsapp;
+      if (cfg.titulo_principal && cfg.titulo_principal.includes('|')) {
+        const parts = cfg.titulo_principal.split('|');
+        local.heroTitle1 = parts[0];
+        local.heroTitle2 = parts[1];
+      }
+      local.heroSubtitle = cfg.subtitulo_principal || local.heroSubtitle;
+      local.contactSubtitle = cfg.texto_contato || local.contactSubtitle;
+      local.heroBg = cfg.banner_url || local.heroBg;
+    }
+    const { data: imoveis } = await supabaseClient.from('imoveis').select('*').eq('ativo', true).order('id');
+    if (imoveis && imoveis.length) {
+      local.properties = imoveis.map(i => ({
+        tag: i.destaque,
+        title: i.titulo,
+        location: i.localizacao,
+        details: i.detalhes || i.descricao,
+        price: i.preco,
+        image: i.imagem_url
+      }));
+    }
+    localStorage.setItem('siteAdminData', JSON.stringify(local));
+  } catch (e) {
+    console.warn('Erro ao sincronizar com Supabase', e);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', async function(){
+  await syncFromSupabase();
+});
+
+
 // ===== Site Corretor Premium - Netlify Static Admin =====
 
 const DEFAULT_DATA = {
