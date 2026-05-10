@@ -36,41 +36,61 @@ function applyFilters(){let tipo=norm(get('tipo')),cidade=norm(get('cidade')),ba
 function renderProperties(arr){const grid=document.querySelector('.property-grid'); if(!grid)return; if(!arr.length){grid.innerHTML='<div style="grid-column:1/-1;padding:30px;background:#101720;border:1px solid #ffffff18;border-radius:12px">Nenhum imóvel encontrado com esses filtros.</div>';return} grid.innerHTML=arr.map(p=>`<article class="property-card reveal visible"><div class="property-img" style="background-image:url('${p.imagem_url||'assets/img/property-1.svg'}')"><span>${p.destaque||p.finalidade||p.status||'DESTAQUE'}</span></div><div class="property-body"><h3>${p.titulo||''}</h3><p>${p.bairro?p.bairro+', ':''}${p.cidade||p.localizacao||'Manaus/AM'}</p><small>${p.tipo?p.tipo+' • ':''}${p.finalidade?p.finalidade+' • ':''}${p.zona?'Zona '+p.zona+' • ':''}${p.quartos?p.quartos+' quartos • ':''}${p.banheiros?p.banheiros+' banheiros • ':''}${p.vagas?p.vagas+' vagas • ':''}${p.area_m2?p.area_m2+'m²':(p.detalhes||'')}</small><strong>${p.preco||''}</strong><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">${p.link_externo?`<a class="btn ghost" href="${p.link_externo}" target="_blank" style="padding:10px 12px;font-size:11px">Abrir anúncio</a>`:''}${p.whatsapp_anunciante?`<a class="btn primary" href="https://wa.me/${nums(p.whatsapp_anunciante)}" target="_blank" style="padding:10px 12px;font-size:11px">WhatsApp</a>`:''}</div></div></article>`).join('')}
 function setupContact(cfg){
   const form = document.querySelector('.contact-form');
-  if(!form) return;
+  if (!form) return;
+
+  // Evita múltiplos listeners caso a função seja chamada novamente
+  if (form.dataset.listenerAttached === 'true') return;
+  form.dataset.listenerAttached = 'true';
 
   form.addEventListener('submit', async function(e){
     e.preventDefault();
     e.stopPropagation();
 
-    const inputs = form.querySelectorAll('input');
-    const textarea = form.querySelector('textarea');
+    // Captura os campos pelo atributo "name" (forma correta)
+    const nome = (form.querySelector('[name="nome"]')?.value || '').trim();
+    const whatsapp = (form.querySelector('[name="telefone"]')?.value || '').trim();
+    const interesse = (form.querySelector('[name="interesse"]')?.value || '').trim();
+    const mensagem = (form.querySelector('[name="mensagem"]')?.value || '').trim();
 
-    const nome = (inputs[0]?.value || '').trim();
-    const whatsapp = (inputs[1]?.value || '').trim();
-    const interesse = (inputs[2]?.value || '').trim();
-    const mensagem = (textarea?.value || '').trim();
+    // Validação básica
+    if (!nome || !whatsapp) {
+      alert('Por favor, preencha seu nome e WhatsApp.');
+      return false;
+    }
 
-    try{
-      await supabaseClient.from('mensagens_contato').insert({
-        nome: nome,
-        whatsapp: whatsapp,
-        interesse: interesse,
-        mensagem: mensagem
-      });
-    }catch(err){
+    // Salva no Supabase (se a tabela existir)
+    try {
+      const { error } = await supabaseClient
+        .from('mensagens_contato')
+        .insert({
+          nome: nome,
+          whatsapp: whatsapp,
+          interesse: interesse,
+          mensagem: mensagem
+        });
+
+      if (error) {
+        console.warn('Erro ao salvar no Supabase:', error.message);
+      }
+    } catch (err) {
       console.warn('Não foi possível salvar a mensagem no Supabase:', err);
     }
 
+    // Mensagem de confirmação no site
     let box = document.getElementById('contact-success');
-    if(!box){
+    if (!box) {
       box = document.createElement('div');
       box.id = 'contact-success';
       form.appendChild(box);
     }
 
-    box.style.cssText = 'margin-top:15px;color:#d8a84f;font-weight:800;line-height:1.5';
-    box.textContent = 'Sua mensagem foi enviada para o corretor, assim que possível retornaremos em seu WhatsApp!';
+    box.style.cssText =
+      'margin-top:15px;padding:12px 16px;background:#0b1119;border:1px solid #d8a84f55;border-radius:8px;color:#d8a84f;font-weight:800;line-height:1.5';
 
+    box.textContent =
+      'Sua mensagem foi enviada para o corretor. Em breve retornaremos em seu WhatsApp!';
+
+    // Texto organizado para o WhatsApp
     const texto = `Nova mensagem do site:
 
 Nome: ${nome}
@@ -78,12 +98,22 @@ WhatsApp: ${whatsapp}
 Interesse: ${interesse}
 Mensagem: ${mensagem}`;
 
+    // Número do corretor configurado no painel
     const numeroCorretor = nums(cfg.whatsapp || SITE_CONFIG.whatsapp || '');
-    const urlWhatsApp = `https://wa.me/${numeroCorretor}?text=${encodeURIComponent(texto)}`;
 
-    window.open(urlWhatsApp, '_blank', 'noopener,noreferrer');
+    if (numeroCorretor) {
+      const urlWhatsApp =
+        `https://wa.me/${numeroCorretor}?text=${encodeURIComponent(texto)}`;
 
+      // Abre o WhatsApp em nova aba
+      window.open(urlWhatsApp, '_blank', 'noopener,noreferrer');
+    } else {
+      console.warn('Número do corretor não configurado.');
+    }
+
+    // Limpa o formulário
     form.reset();
+
     return false;
   });
 }
