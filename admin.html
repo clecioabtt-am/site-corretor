@@ -1,37 +1,200 @@
 <!DOCTYPE html>
-<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Área do Corretor</title>
 <link rel="stylesheet" href="assets/css/style.css">
-<style>body{padding:40px}.admin-box{max-width:700px;margin:auto;padding:30px;background:#101720;border:1px solid #ffffff18;border-radius:12px}label{display:block;margin:15px 0 5px}input{width:100%;padding:12px;background:#060b11;color:#fff;border:1px solid #ffffff18}.hidden{display:none}</style>
-</head><body>
-<div class="admin-box" id="loginBox">
-<h2>Login Administrativo</h2>
-<label>Usuário</label><input id="user" value="admin">
-<label>Senha</label><input id="pass" type="password" value="admin123">
-<button class="btn primary" style="margin-top:20px" onclick="login()">Entrar</button>
+<style>
+body{padding:30px;background:#070b10;color:#f7f4ee}
+.admin-wrap{max-width:1180px;margin:0 auto}
+.admin-card{background:#101720;border:1px solid #ffffff18;border-radius:14px;padding:26px;box-shadow:0 28px 70px #0009;margin-bottom:22px}
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+label{display:block;margin:12px 0 6px;color:#f1c978;font-weight:800;font-size:13px}
+input,textarea{width:100%;padding:13px;background:#060b11;color:#fff;border:1px solid #ffffff18;border-radius:6px}
+textarea{min-height:90px}
+.hidden{display:none}
+.admin-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+.property-editor{border:1px solid #ffffff18;padding:16px;border-radius:10px;margin:14px 0;background:#0b1119}
+.property-editor h3{margin-top:0;color:#f1c978}
+.notice{padding:14px;background:#060b11;border:1px solid #d8a84f55;border-radius:8px;color:#f1c978;margin:12px 0}
+@media(max-width:800px){.admin-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="admin-wrap">
+
+  <div class="admin-card" id="loginBox">
+    <h1>Painel do Corretor</h1>
+    <p>Entre para editar as informações exibidas no site.</p>
+    <label>Usuário</label>
+    <input id="user" value="admin">
+    <label>Senha</label>
+    <input id="pass" type="password" value="admin123">
+    <div class="admin-actions">
+      <button class="btn primary" onclick="login()">Entrar</button>
+      <a class="btn ghost" href="index.html">Voltar ao site</a>
+    </div>
+  </div>
+
+  <div class="hidden" id="panel">
+    <div class="admin-card">
+      <h1>Painel do Corretor</h1>
+      <div class="notice">As alterações ficam salvas neste navegador. Para banco de dados online, será necessário integrar Firebase ou Supabase.</div>
+      <div class="admin-actions">
+        <button class="btn primary" onclick="salvarTudo()">Salvar Tudo</button>
+        <button class="btn ghost" onclick="resetar()">Restaurar padrão</button>
+        <a class="btn ghost" href="index.html">Ver Site</a>
+      </div>
+    </div>
+
+    <div class="admin-card">
+      <h2>Identidade do corretor</h2>
+      <div class="admin-grid">
+        <div><label>Nome do corretor</label><input id="nome"></div>
+        <div><label>CRECI</label><input id="creci"></div>
+        <div><label>WhatsApp do corretor</label><input id="whatsapp" placeholder="5592999999999"></div>
+        <div><label>Texto da logo</label><input id="logoText" placeholder="RA"></div>
+      </div>
+    </div>
+
+    <div class="admin-card">
+      <h2>Banner principal</h2>
+      <label>Frase pequena acima do título</label><input id="heroEyebrow">
+      <div class="admin-grid">
+        <div><label>Título linha 1</label><input id="heroTitle1"></div>
+        <div><label>Título linha 2</label><input id="heroTitle2"></div>
+      </div>
+      <label>Texto do banner</label><textarea id="heroSubtitle"></textarea>
+      <label>Imagem de fundo do banner/área principal em Base64 ou URL</label>
+      <input id="heroBg" placeholder="Cole uma URL de imagem ou base64">
+      <label>Carregar imagem de fundo</label>
+      <input type="file" accept="image/*" onchange="fileToInput(this,'heroBg')">
+    </div>
+
+    <div class="admin-card">
+      <h2>Contato</h2>
+      <label>Título da seção contato</label><input id="contactTitle">
+      <label>Subtítulo da seção contato</label><input id="contactSubtitle">
+    </div>
+
+    <div class="admin-card">
+      <h2>Imóveis do Portfólio</h2>
+      <div id="propertiesBox"></div>
+      <button class="btn primary" onclick="addProperty()">Adicionar imóvel</button>
+    </div>
+  </div>
 </div>
-<div class="admin-box hidden" id="panel">
-<h2>Painel do Corretor</h2>
-<label>Nome do Corretor</label><input id="nome">
-<label>CRECI</label><input id="creci">
-<label>WhatsApp do Corretor</label><input id="whatsapp" placeholder="5592999999999">
-<button class="btn primary" style="margin-top:20px" onclick="salvar()">Salvar Alterações</button>
-<a href="index.html" class="btn ghost" style="margin-top:10px;display:inline-block">Voltar ao Site</a>
-</div>
+
 <script>
+const DEFAULT_DATA = {
+  nome: "Ricardo Almeida",
+  creci: "CRECI 123456-F",
+  whatsapp: "5592986155502",
+  logoText: "RA",
+  heroEyebrow: "EXCLUSIVIDADE QUE TRANSFORMA",
+  heroTitle1: "Imóveis selecionados",
+  heroTitle2: "para uma vida extraordinária",
+  heroSubtitle: "Soluções imobiliárias personalizadas para quem busca exclusividade, segurança e os melhores investimentos.",
+  contactTitle: "Pronto para encontrar o imóvel ideal?",
+  contactSubtitle: "Solicite uma consultoria personalizada.",
+  heroBg: "",
+  properties: [
+    {tag:"DESTAQUE", title:"Casa no Alphaville", location:"Manaus/AM", details:"4 suítes • 6 banheiros • 450m²", price:"R$ 4.800.000", image:"assets/img/property-1.svg"},
+    {tag:"EXCLUSIVO", title:"Apartamento Vista Rio Negro", location:"Ponta Negra, Manaus/AM", details:"3 suítes • 4 banheiros • 210m²", price:"R$ 3.200.000", image:"assets/img/property-2.svg"},
+    {tag:"LANÇAMENTO", title:"Condomínio Reserva do Sol", location:"Tarumã, Manaus/AM", details:"5 suítes • 7 banheiros • 680m²", price:"R$ 6.900.000", image:"assets/img/property-3.svg"}
+  ]
+};
+let data = {...DEFAULT_DATA, ...(JSON.parse(localStorage.getItem("siteAdminData") || "{}"))};
+
 function login(){
- if(document.getElementById('user').value==='admin' && document.getElementById('pass').value==='admin123'){
-   document.getElementById('loginBox').classList.add('hidden');
-   document.getElementById('panel').classList.remove('hidden');
-   const d = JSON.parse(localStorage.getItem('siteAdminData') || '{}');
-   nome.value = d.nome || 'Ricardo Almeida';
-   creci.value = d.creci || 'CRECI 123456-F';
-   whatsapp.value = d.whatsapp || '5592986155502';
- } else alert('Usuário ou senha inválidos.');
+  if(user.value === "admin" && pass.value === "admin123"){
+    loginBox.classList.add("hidden");
+    panel.classList.remove("hidden");
+    carregarCampos();
+  } else {
+    alert("Usuário ou senha inválidos.");
+  }
 }
-function salvar(){
- const d = {nome:nome.value, creci:creci.value, whatsapp:whatsapp.value};
- localStorage.setItem('siteAdminData', JSON.stringify(d));
- alert('Alterações salvas com sucesso!');
+
+function carregarCampos(){
+  for(const k of ["nome","creci","whatsapp","logoText","heroEyebrow","heroTitle1","heroTitle2","heroSubtitle","heroBg","contactTitle","contactSubtitle"]){
+    document.getElementById(k).value = data[k] || "";
+  }
+  renderPropertiesAdmin();
 }
-</script></body></html>
+
+function lerCampos(){
+  for(const k of ["nome","creci","whatsapp","logoText","heroEyebrow","heroTitle1","heroTitle2","heroSubtitle","heroBg","contactTitle","contactSubtitle"]){
+    data[k] = document.getElementById(k).value;
+  }
+  data.properties = [...document.querySelectorAll(".property-editor")].map(box => ({
+    tag: box.querySelector(".p-tag").value,
+    title: box.querySelector(".p-title").value,
+    location: box.querySelector(".p-location").value,
+    details: box.querySelector(".p-details").value,
+    price: box.querySelector(".p-price").value,
+    image: box.querySelector(".p-image").value
+  }));
+}
+
+function salvarTudo(){
+  lerCampos();
+  localStorage.setItem("siteAdminData", JSON.stringify(data));
+  alert("Alterações salvas com sucesso!");
+}
+
+function resetar(){
+  if(confirm("Deseja restaurar as informações padrão?")){
+    localStorage.removeItem("siteAdminData");
+    data = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    carregarCampos();
+  }
+}
+
+function addProperty(){
+  data.properties.push({tag:"NOVO", title:"Novo Imóvel", location:"Manaus/AM", details:"3 suítes • 2 vagas • 200m²", price:"R$ 900.000", image:"assets/img/property-1.svg"});
+  renderPropertiesAdmin();
+}
+
+function removeProperty(i){
+  data.properties.splice(i,1);
+  renderPropertiesAdmin();
+}
+
+function renderPropertiesAdmin(){
+  propertiesBox.innerHTML = data.properties.map((p,i)=>`
+    <div class="property-editor">
+      <h3>Imóvel ${i+1}</h3>
+      <div class="admin-grid">
+        <div><label>Selo</label><input class="p-tag" value="${p.tag || ""}"></div>
+        <div><label>Título</label><input class="p-title" value="${p.title || ""}"></div>
+        <div><label>Localização</label><input class="p-location" value="${p.location || ""}"></div>
+        <div><label>Preço</label><input class="p-price" value="${p.price || ""}"></div>
+      </div>
+      <label>Detalhes</label><input class="p-details" value="${p.details || ""}">
+      <label>Imagem do imóvel em Base64 ou URL</label><input class="p-image" value="${p.image || ""}">
+      <label>Carregar imagem do imóvel</label><input type="file" accept="image/*" onchange="fileToProperty(this,${i})">
+      <div class="admin-actions"><button class="btn ghost" onclick="removeProperty(${i})">Remover imóvel</button></div>
+    </div>
+  `).join("");
+}
+
+function fileToInput(input, targetId){
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => document.getElementById(targetId).value = e.target.result;
+  reader.readAsDataURL(file);
+}
+
+function fileToProperty(input, i){
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.querySelectorAll(".property-editor")[i].querySelector(".p-image").value = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+</script>
+</body>
+</html>
