@@ -40,10 +40,9 @@ textarea{min-height:90px}
     <label>Senha</label><input id="senha" type="password" placeholder="sua senha">
     <div class="admin-actions">
       <button class="btn primary" onclick="entrar()">Entrar</button>
-      <button class="btn ghost" onclick="criarConta()">Criar primeiro acesso</button>
       <a class="btn ghost" href="index.html">Voltar ao site</a>
     </div>
-    <div class="notice">Para o primeiro uso, clique em “Criar primeiro acesso”. Depois use “Entrar”.</div>
+    <div class="notice">Crie o usuário administrativo diretamente no Supabase em Authentication → Users → Add user. Depois utilize o e-mail e a senha cadastrados para entrar.</div>
   </div>
 
   <div id="panel" class="hidden">
@@ -134,11 +133,7 @@ function showTab(name, btn){
   btn.classList.add("active");
 }
 
-async function criarConta(){
-  const { error } = await supabaseClient.auth.signUp({email: email.value, password: senha.value});
-  if(error) return alert("Erro ao criar acesso: " + error.message);
-  alert("Acesso criado. Se o Supabase pedir confirmação por e-mail, confirme antes de entrar.");
-}
+
 
 async function entrar(){
   const { error } = await supabaseClient.auth.signInWithPassword({email: email.value, password: senha.value});
