@@ -1,7 +1,7 @@
 
 const supabaseClient = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
 let ALL_PROPERTIES=[]; let SITE_CONFIG={};
-const DEFAULT_CONFIG={nome_corretor:'Ricardo Almeida',creci:'CRECI 123456-F',whatsapp:'5592986155502',logo_texto:'RA',logo_url:'',banner_url:'',titulo_principal:'Imóveis selecionados|para uma vida extraordinária',subtitulo_principal:'Soluções imobiliárias personalizadas para quem busca exclusividade, segurança e os melhores investimentos.',texto_contato:'Solicite uma consultoria personalizada.',footer_text:'',agent_url:'',mostrar_agent:true};
+const DEFAULT_CONFIG={nome_corretor:'Ricardo Almeida',creci:'CRECI 123456-F',whatsapp:'5592986155502',logo_texto:'RA',logo_url:'',banner_url:'',titulo_principal:'Imóveis selecionados|para uma vida extraordinária',subtitulo_principal:'Soluções imobiliárias personalizadas para quem busca exclusividade, segurança e os melhores investimentos.',texto_contato:'Solicite uma consultoria personalizada.',footer_text:''};
 const LEGACY_DEFAULT_FOOTER='© 2026 Ricardo Almeida · Corretor de Imóveis · CRECI 123456-F';
 function nums(v){return String(v||'').replace(/\D/g,'')}
 function norm(v){return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim()}
