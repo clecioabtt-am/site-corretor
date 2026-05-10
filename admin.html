@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Área do Corretor</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<style>body{padding:40px}.admin-box{max-width:700px;margin:auto;padding:30px;background:#101720;border:1px solid #ffffff18;border-radius:12px}label{display:block;margin:15px 0 5px}input{width:100%;padding:12px;background:#060b11;color:#fff;border:1px solid #ffffff18}.hidden{display:none}</style>
+</head><body>
+<div class="admin-box" id="loginBox">
+<h2>Login Administrativo</h2>
+<label>Usuário</label><input id="user" value="admin">
+<label>Senha</label><input id="pass" type="password" value="admin123">
+<button class="btn primary" style="margin-top:20px" onclick="login()">Entrar</button>
+</div>
+<div class="admin-box hidden" id="panel">
+<h2>Painel do Corretor</h2>
+<label>Nome do Corretor</label><input id="nome">
+<label>CRECI</label><input id="creci">
+<label>WhatsApp do Corretor</label><input id="whatsapp" placeholder="5592999999999">
+<button class="btn primary" style="margin-top:20px" onclick="salvar()">Salvar Alterações</button>
+<a href="index.html" class="btn ghost" style="margin-top:10px;display:inline-block">Voltar ao Site</a>
+</div>
+<script>
+function login(){
+ if(document.getElementById('user').value==='admin' && document.getElementById('pass').value==='admin123'){
+   document.getElementById('loginBox').classList.add('hidden');
+   document.getElementById('panel').classList.remove('hidden');
+   const d = JSON.parse(localStorage.getItem('siteAdminData') || '{}');
+   nome.value = d.nome || 'Ricardo Almeida';
+   creci.value = d.creci || 'CRECI 123456-F';
+   whatsapp.value = d.whatsapp || '5592986155502';
+ } else alert('Usuário ou senha inválidos.');
+}
+function salvar(){
+ const d = {nome:nome.value, creci:creci.value, whatsapp:whatsapp.value};
+ localStorage.setItem('siteAdminData', JSON.stringify(d));
+ alert('Alterações salvas com sucesso!');
+}
+</script></body></html>
