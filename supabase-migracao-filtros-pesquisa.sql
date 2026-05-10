@@ -3,7 +3,8 @@ alter table site_config add column if not exists logo_texto text default 'RA';
 alter table site_config add column if not exists logo_url text;
 alter table site_config add column if not exists banner_url text;
 alter table site_config add column if not exists updated_at timestamp with time zone default now();
-alter table site_config add column if not exists footer_text text default '© 2026 Ricardo Almeida · Corretor de Imóveis · CRECI 123456-F';
+alter table site_config add column if not exists footer_text text;
+update site_config set footer_text = null where footer_text = '© 2026 Ricardo Almeida · Corretor de Imóveis · CRECI 123456-F';
 alter table site_config add column if not exists agent_url text;
 alter table site_config add column if not exists mostrar_agent boolean default true;
 
