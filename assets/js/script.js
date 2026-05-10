@@ -14,8 +14,18 @@ async function loadConfig(){const r=await supabaseClient.from('site_config').sel
  const lead=document.querySelector('.hero .lead'); if(lead) lead.textContent=SITE_CONFIG.subtitulo_principal||'';
  const bg=document.querySelector('.hero-bg'); if(bg&&SITE_CONFIG.banner_url) bg.style.background=`radial-gradient(circle at 75% 25%,#d8a84f30,transparent 24%),linear-gradient(90deg,#07101b 0%,#07101bee 35%,#07101b44 70%),url('${SITE_CONFIG.banner_url}') center/cover no-repeat`;
  const cp=document.querySelector('#contato p,.contact p'); if(cp) cp.textContent=SITE_CONFIG.texto_contato||'';
- const footer=document.getElementById('footerText'); if(footer) footer.textContent=SITE_CONFIG.footer_text || `© 2026 ${SITE_CONFIG.nome_corretor||'Corretor de Imóveis'} · Corretor de Imóveis · ${SITE_CONFIG.creci||''}`;
- const agentCard=document.querySelector('.agent-card'); const agentPhoto=document.querySelector('.agent-photo');
+const footer = document.getElementById('footerText');
+if (footer) {
+  const textoRodape = (SITE_CONFIG.footer_text || '').trim();
+
+  if (textoRodape !== '') {
+    footer.textContent = textoRodape;
+  } else {
+    footer.textContent =
+      `© 2026 ${SITE_CONFIG.nome_corretor || 'Ricardo Almeida'} · ` +
+      `Corretor de Imóveis · ${SITE_CONFIG.creci || 'CRECI 123456-F'}`;
+  }
+} const agentCard=document.querySelector('.agent-card'); const agentPhoto=document.querySelector('.agent-photo');
  if(agentCard){
    const showAgent = SITE_CONFIG.mostrar_agent !== false && SITE_CONFIG.mostrar_agent !== 'false';
    agentCard.style.display = showAgent ? '' : 'none';
