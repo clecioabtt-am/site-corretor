@@ -1,7 +1,7 @@
 
 const supabaseClient = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
 let ALL_PROPERTIES=[]; let SITE_CONFIG={};
-const DEFAULT_CONFIG={nome_corretor:'Ricardo Almeida',creci:'CRECI 123456-F',whatsapp:'5592986155502',logo_texto:'RA',logo_url:'',banner_url:'',titulo_principal:'Imóveis selecionados|para uma vida extraordinária',subtitulo_principal:'Soluções imobiliárias personalizadas para quem busca exclusividade, segurança e os melhores investimentos.',texto_contato:'Solicite uma consultoria personalizada.'};
+const DEFAULT_CONFIG={nome_corretor:'Ricardo Almeida',creci:'CRECI 123456-F',whatsapp:'5592986155502',logo_texto:'RA',logo_url:'',banner_url:'',titulo_principal:'Imóveis selecionados|para uma vida extraordinária',subtitulo_principal:'Soluções imobiliárias personalizadas para quem busca exclusividade, segurança e os melhores investimentos.',texto_contato:'Solicite uma consultoria personalizada.',footer_text:'© 2026 Ricardo Almeida · Corretor de Imóveis · CRECI 123456-F',agent_url:'',mostrar_agent:true};
 function nums(v){return String(v||'').replace(/\D/g,'')}
 function norm(v){return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim()}
 function money(v){return parseFloat(String(v||'').replace(/[^\d,.-]/g,'').replace(/\./g,'').replace(',','.'))||0}
@@ -14,6 +14,14 @@ async function loadConfig(){const r=await supabaseClient.from('site_config').sel
  const lead=document.querySelector('.hero .lead'); if(lead) lead.textContent=SITE_CONFIG.subtitulo_principal||'';
  const bg=document.querySelector('.hero-bg'); if(bg&&SITE_CONFIG.banner_url) bg.style.background=`radial-gradient(circle at 75% 25%,#d8a84f30,transparent 24%),linear-gradient(90deg,#07101b 0%,#07101bee 35%,#07101b44 70%),url('${SITE_CONFIG.banner_url}') center/cover no-repeat`;
  const cp=document.querySelector('#contato p,.contact p'); if(cp) cp.textContent=SITE_CONFIG.texto_contato||'';
+ const footer=document.getElementById('footerText'); if(footer) footer.textContent=SITE_CONFIG.footer_text || `© 2026 ${SITE_CONFIG.nome_corretor||'Corretor de Imóveis'} · Corretor de Imóveis · ${SITE_CONFIG.creci||''}`;
+ const agentCard=document.querySelector('.agent-card'); const agentPhoto=document.querySelector('.agent-photo');
+ if(agentCard){
+   const showAgent = SITE_CONFIG.mostrar_agent !== false && SITE_CONFIG.mostrar_agent !== 'false';
+   agentCard.style.display = showAgent ? '' : 'none';
+   if(!showAgent){ const heroContent=document.querySelector('.hero-content'); if(heroContent) heroContent.style.gridTemplateColumns='1fr'; }
+ }
+ if(agentPhoto && SITE_CONFIG.agent_url){ agentPhoto.style.background=`linear-gradient(180deg,#ffffff05,#0008),url('${SITE_CONFIG.agent_url}') center bottom/contain no-repeat`; }
  document.querySelectorAll('a[href*="wa.me"],.whatsapp').forEach(a=>{if(a.tagName==='A')a.href=`https://wa.me/${nums(SITE_CONFIG.whatsapp)}`}); return SITE_CONFIG;}
 async function loadProperties(){const {data}=await supabaseClient.from('imoveis').select('*').eq('ativo',true).order('id',{ascending:true}); ALL_PROPERTIES=data||[]; populateFilters(); renderProperties(ALL_PROPERTIES)}
 function get(name){return document.querySelector(`[data-filter="${name}"]`)?.value||''}
