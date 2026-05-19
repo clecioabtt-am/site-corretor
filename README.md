@@ -1,25 +1,23 @@
-# Site Corretor - Cloudflare Pages (rota admin corrigida)
+# Oclesio Araújo Jr - Site Premium Imobiliário
 
-## IMPORTANTE
-Antes de enviar para o GitHub, apague os arquivos antigos do repositório, principalmente:
-- `_redirects`
-- `netlify.toml`
-- `wrangler.toml`
-- qualquer pasta antiga `/admin` que não seja a deste pacote
+Projeto estático 100% compatível com Cloudflare Pages + Supabase.
 
-## Rotas
-- Site: `/`
-- Login do corretor: `/admin/`
-- Alternativa: `/corretor.html`
-
-## Cloudflare Pages
-- Framework preset: None
-- Build command: deixar vazio
-- Output directory: `/` ou deixar vazio
+## Como publicar
+1. Envie todos os arquivos para um repositório GitHub.
+2. No Cloudflare Pages, conecte o repositório.
+3. Build command: deixe vazio.
+4. Build output directory: `/` ou deixe vazio.
+5. Deploy.
 
 ## Supabase
-Configure `assets/js/config.js` com:
-- `SUPABASE_URL`
-- `SUPABASE_ANON_KEY`
+1. Abra o arquivo `supabase/supabase-schema.sql`.
+2. Cole no SQL Editor do Supabase e clique em Run.
+3. Crie um usuário em Authentication > Users.
+4. Copie `config.example.js` para `config.js`.
+5. Preencha `url` e `anonKey`.
 
-Não use `service_role` no frontend.
+## Login administrativo
+Acesse `/admin/`.
+
+## Observação sobre busca na internet
+Sem API externa, o projeto usa uma busca assistida que monta links de pesquisa avançada no Google/Bing com base nos filtros selecionados. Isso evita scraping irregular e mantém o projeto estável no Cloudflare.
