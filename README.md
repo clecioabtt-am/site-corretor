@@ -21,3 +21,7 @@ Sem API paga, o sistema abre uma pesquisa estruturada no Google com os filtros e
 
 
 Correção de rota administrativa: a área do corretor funciona em /admin/ e também em /admin.html. Não use arquivo _redirects neste projeto.
+
+
+## Correção importante de rota
+A Área do Corretor usa o arquivo `corretor.html`. No menu principal, o link aponta para `corretor.html`, evitando loop de redirect em `/admin` no Cloudflare Pages. Não use `_redirects` neste projeto.
