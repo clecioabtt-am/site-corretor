@@ -1,25 +1,20 @@
-# Site Corretor — versão Cloudflare Pages
+# Site Corretor Premium - Cloudflare Pages + Supabase
 
-Projeto revisado para Cloudflare Pages.
+Projeto estático, sem Netlify, pronto para publicar no Cloudflare Pages via GitHub.
 
-## Configuração recomendada no Cloudflare Pages
+## Como configurar
+1. Crie um projeto no Supabase.
+2. Abra o arquivo `supabase-schema.sql` e execute tudo no SQL Editor do Supabase.
+3. Em Authentication > Users, crie o usuário do corretor.
+4. Em Project Settings > API, copie `Project URL` e `anon public key`.
+5. Cole esses dados em `assets/js/config.js`.
+6. Faça commit no GitHub. O Cloudflare Pages fará o deploy automático.
 
-- Framework preset: None
-- Build command: deixar em branco
-- Build output directory: `/` ou `.`
-- Root directory: `/`
+## Cloudflare Pages
+- Build command: deixe vazio
+- Output directory: `/` ou deixe padrão se os arquivos estiverem na raiz
+- Não usa `_redirects`
+- Não usa `netlify.toml`
 
-## Observações
-
-- Arquivos do Netlify removidos.
-- `_redirects` removido para evitar loop no Cloudflare Pages.
-- O projeto é estático e pode subir sem variáveis de ambiente.
-- A conexão com Supabase usa `assets/js/supabase-config.js`.
-
-## Arquivos principais
-
-- `index.html`: site público
-- `admin.html`: painel do corretor
-- `assets/js/supabase-config.js`: configuração pública do Supabase
-- `assets/js/script.js`: integração do site com Supabase
-- `assets/js/main.js`: menu e animações
+## Busca de imóveis na internet
+Sem API paga, o sistema abre uma pesquisa estruturada no Google com os filtros escolhidos. Para anúncios externos, o corretor pode cadastrar o link do anúncio no painel.
