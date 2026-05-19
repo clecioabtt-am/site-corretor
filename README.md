@@ -1,27 +1,25 @@
-# Site Corretor Premium - Cloudflare Pages + Supabase
+# Site Corretor - Cloudflare Pages (rota admin corrigida)
 
-Projeto estático, sem Netlify, pronto para publicar no Cloudflare Pages via GitHub.
+## IMPORTANTE
+Antes de enviar para o GitHub, apague os arquivos antigos do repositório, principalmente:
+- `_redirects`
+- `netlify.toml`
+- `wrangler.toml`
+- qualquer pasta antiga `/admin` que não seja a deste pacote
 
-## Como configurar
-1. Crie um projeto no Supabase.
-2. Abra o arquivo `supabase-schema.sql` e execute tudo no SQL Editor do Supabase.
-3. Em Authentication > Users, crie o usuário do corretor.
-4. Em Project Settings > API, copie `Project URL` e `anon public key`.
-5. Cole esses dados em `assets/js/config.js`.
-6. Faça commit no GitHub. O Cloudflare Pages fará o deploy automático.
+## Rotas
+- Site: `/`
+- Login do corretor: `/admin/`
+- Alternativa: `/corretor.html`
 
 ## Cloudflare Pages
-- Build command: deixe vazio
-- Output directory: `/` ou deixe padrão se os arquivos estiverem na raiz
-- Não usa `_redirects`
-- Não usa `netlify.toml`
+- Framework preset: None
+- Build command: deixar vazio
+- Output directory: `/` ou deixar vazio
 
-## Busca de imóveis na internet
-Sem API paga, o sistema abre uma pesquisa estruturada no Google com os filtros escolhidos. Para anúncios externos, o corretor pode cadastrar o link do anúncio no painel.
+## Supabase
+Configure `assets/js/config.js` com:
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
 
-
-Correção de rota administrativa: a área do corretor funciona em /admin/ e também em /admin.html. Não use arquivo _redirects neste projeto.
-
-
-## Correção importante de rota
-A Área do Corretor usa o arquivo `corretor.html`. No menu principal, o link aponta para `corretor.html`, evitando loop de redirect em `/admin` no Cloudflare Pages. Não use `_redirects` neste projeto.
+Não use `service_role` no frontend.
