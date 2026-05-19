@@ -1,123 +1,73 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ricardo Almeida | Corretor de Imóveis de Alto Padrão</title>
-  <meta name="description" content="Site profissional premium para corretor de imóveis de alto padrão, pronto para Cloudflare Pages." />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ricardo Almeida | Corretor de Imóveis</title>
+  <meta name="description" content="Imóveis premium para venda e aluguel com atendimento consultivo." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/style.css" />
 </head>
 <body>
-  <header class="topbar">
-    <a class="brand" href="#inicio">
-      <span class="brand-mark">RA</span>
-      <span><strong>Ricardo Almeida</strong><small>Corretor de Imóveis · CRECI 123456-F</small></span>
+  <header class="nav-shell">
+    <a class="brand" href="#home" aria-label="Página inicial">
+      <span class="brand-mark" data-setting="logo_text">RA</span>
+      <span><strong data-setting="site_name">Ricardo Almeida</strong><small data-setting="site_subtitle">Corretor de imóveis · CRECI 123456-F</small></span>
     </a>
-    <button class="menu-btn" aria-label="Abrir menu">☰</button>
-    <nav class="nav">
-      <a href="#inicio">Início</a>
-      <a href="#imoveis">Imóveis</a>
-      <a href="#sobre">Sobre</a>
-      <a href="#servicos">Serviços</a>
-      
-      <a href="#contato">Contato</a>
-    <a href="admin.html">Área do Corretor</a></nav>
-    <a class="whatsapp" href="https://wa.me/5592999999999" target="_blank" rel="noopener">💬 Falar no WhatsApp</a>
+    <button class="menu-toggle" id="menuToggle">☰</button>
+    <nav id="mainMenu">
+      <a href="#home">Início</a><a href="#imoveis">Imóveis</a><a href="#sobre">Sobre</a><a href="#servicos">Serviços</a><a href="#contato">Contato</a><a class="gold" href="/admin/">Área do corretor</a>
+    </nav>
+    <a class="btn ghost" id="whatsTop" target="_blank" rel="noopener">💬 Falar no WhatsApp</a>
   </header>
 
-  <main id="inicio" class="hero">
-    <div class="hero-bg"></div>
-    <section class="hero-content">
-      <div class="hero-text reveal">
+  <main>
+    <section id="home" class="hero premium-bg">
+      <div class="hero-copy reveal">
         <p class="eyebrow">Exclusividade · Segurança · Valorização</p>
-        <h1>Imóveis selecionados <span>para uma vida extraordinária</span></h1>
-        <p class="lead">Soluções imobiliárias personalizadas para quem busca alto padrão, rentabilidade e atendimento premium em cada etapa da negociação.</p>
-        <div class="actions">
-          <a class="btn primary" href="#imoveis">Ver imóveis →</a>
-          <a class="btn ghost" href="#servicos">Conhecer serviços</a>
-        </div>
-        <div class="trust-row">
-          <article><b>💎 Seleção exclusiva</b><small>Imóveis rigorosamente selecionados</small></article>
-          <article><b>🛡️ Segurança total</b><small>Negociações transparentes</small></article>
-          <article><b>🎧 Atendimento premium</b><small>Acompanhamento em todas as etapas</small></article>
-        </div>
+        <h1 data-setting="hero_title">Imóveis selecionados para uma vida extraordinária</h1>
+        <p class="hero-text" data-setting="hero_subtitle">Soluções imobiliárias personalizadas para quem busca exclusividade, segurança e os melhores investimentos.</p>
+        <div class="hero-actions"><a class="btn primary" href="#imoveis">Ver imóveis →</a><a class="btn ghost dark" href="#servicos">Conhecer serviços</a></div>
+        <div class="stats"><div><b id="statAvailable">0</b><span>Disponíveis</span></div><div><b id="statSale">0</b><span>À venda</span></div><div><b id="statRent">0</b><span>Para alugar</span></div></div>
+      </div>
+      <div class="hero-card reveal">
+        <div class="glass-card floating"><span>Curadoria Premium</span><strong>Atendimento estratégico para compra, venda e locação.</strong></div>
+        <div class="house-3d"><div class="roof"></div><div class="wall"><span></span><span></span><span></span></div></div>
       </div>
     </section>
 
-    <section class="search-panel reveal">
-      <label>Tipo de imóvel<select><option>Todos os tipos</option><option>Casa</option><option>Apartamento</option><option>Terreno</option></select></label>
-      <label>Cidade<select><option>Todas as cidades</option><option>Manaus</option><option>Iranduba</option><option>Presidente Figueiredo</option></select></label>
-      <label>Bairro<select><option>Todos os bairros</option><option>Ponta Negra</option><option>Tarumã</option><option>Adrianópolis</option></select></label>
-      <label>Valor máximo<select><option>R$ 5.000.000+</option><option>Até R$ 1.000.000</option><option>Até R$ 2.500.000</option></select></label>
-      <button class="btn primary">🔎 Buscar imóveis</button>
+    <section class="section search-panel reveal" id="imoveis">
+      <div class="section-head"><p class="eyebrow">Vitrine inteligente</p><h2>Encontre o imóvel ideal</h2><p>Filtre imóveis cadastrados pelo corretor ou abra uma busca inteligente na internet com os mesmos critérios.</p></div>
+      <form class="filters" id="filtersForm">
+        <select id="filterPurpose"><option value="">Venda ou aluguel</option><option value="venda">Venda</option><option value="aluguel">Aluguel</option></select>
+        <select id="filterType"><option value="">Tipo</option><option>Casa</option><option>Apartamento</option><option>Terreno</option><option>Comercial</option><option>Chácara</option><option>Cobertura</option></select>
+        <input id="filterCity" placeholder="Cidade" />
+        <input id="filterNeighborhood" placeholder="Bairro" />
+        <input id="filterMaxPrice" type="number" placeholder="Preço máximo" />
+        <button class="btn primary" type="submit">Filtrar</button>
+        <button class="btn ghost dark" type="button" id="internetSearch">Buscar na internet</button>
+      </form>
+      <div class="property-grid" id="propertyGrid"></div>
     </section>
+
+    <section class="section split reveal" id="sobre">
+      <div><p class="eyebrow">Consultoria imobiliária</p><h2>Estratégia, apresentação e negociação em alto padrão</h2><p>Experiência digital sofisticada para valorizar imóveis, acelerar contatos qualificados e apresentar oportunidades com clareza.</p></div>
+      <div class="feature-stack"><article><b>01</b><strong>Vitrine elegante</strong><span>Cards, status e filtros para imóveis cadastrados.</span></article><article><b>02</b><strong>Painel do corretor</strong><span>Cadastro, edição, personalização visual e gestão de leads.</span></article><article><b>03</b><strong>Supabase</strong><span>Dados salvos em banco, com login seguro para o administrador.</span></article></div>
+    </section>
+
+    <section class="section services reveal" id="servicos">
+      <div class="section-head"><p class="eyebrow">Serviços</p><h2>Atuação completa</h2></div>
+      <div class="service-grid"><article>🏡 <h3>Venda de imóveis</h3><p>Apresentação profissional, precificação e negociação.</p></article><article>🔑 <h3>Locação</h3><p>Divulgação, triagem e acompanhamento de interessados.</p></article><article>📈 <h3>Investimentos</h3><p>Curadoria de oportunidades com potencial de valorização.</p></article></div>
+    </section>
+
+    <section class="section contact reveal" id="contato"><p class="eyebrow">Contato</p><h2>Vamos conversar sobre seu próximo imóvel?</h2><p>Fale diretamente pelo WhatsApp e receba atendimento personalizado.</p><a class="btn primary" id="whatsBottom" target="_blank" rel="noopener">Chamar no WhatsApp</a></section>
   </main>
 
-  <section id="imoveis" class="section grid-section">
-    <div class="section-title reveal">
-      <p class="eyebrow">Portfólio premium</p>
-      <h2>Imóveis em destaque</h2>
-    </div>
-    <div class="property-grid">
-      <article class="property-card reveal">
-        <div class="property-img img-1"><span>Destaque</span></div>
-        <div class="property-body"><h3>Casa no Alphaville</h3><p>Manaus/AM</p><small>4 suítes · 6 banheiros · 450m²</small><strong>R$ 4.800.000</strong></div>
-      </article>
-      <article class="property-card reveal">
-        <div class="property-img img-2"><span>Exclusivo</span></div>
-        <div class="property-body"><h3>Apartamento Vista Rio Negro</h3><p>Ponta Negra, Manaus/AM</p><small>3 suítes · 4 banheiros · 210m²</small><strong>R$ 3.200.000</strong></div>
-      </article>
-      <article class="property-card reveal">
-        <div class="property-img img-3"><span>Lançamento</span></div>
-        <div class="property-body"><h3>Condomínio Reserva do Sol</h3><p>Tarumã, Manaus/AM</p><small>5 suítes · 7 banheiros · 680m²</small><strong>R$ 6.900.000</strong></div>
-      </article>
-    </div>
-  </section>
-
-  <section id="sobre" class="section split">
-    <div class="reveal"><p class="eyebrow">Sobre o corretor</p><h2>Estratégia, discrição e resultado.</h2><p>Atuação consultiva para compra, venda e avaliação de imóveis residenciais e comerciais de alto padrão, com análise de mercado, curadoria e acompanhamento documental.</p></div>
-    <div class="stats reveal"><article><strong>+12</strong><span>Anos de experiência</span></article><article><strong>+1.250</strong><span>Negócios realizados</span></article><article><strong>+980</strong><span>Clientes satisfeitos</span></article><article><strong>+500</strong><span>Imóveis disponíveis</span></article></div>
-  </section>
-
-  <section id="servicos" class="section services">
-    <div class="section-title reveal"><p class="eyebrow">Soluções completas</p><h2>Serviços imobiliários</h2></div>
-    <div class="service-grid">
-      <article class="service-card reveal">🏛️<h3>Compra e venda</h3><p>Intermediação profissional com segurança jurídica e negociação estratégica.</p></article>
-      <article class="service-card reveal">📈<h3>Avaliação de imóvel</h3><p>Análise de mercado para descobrir o valor real do seu patrimônio.</p></article>
-      <article class="service-card reveal">🧾<h3>Documentação</h3><p>Acompanhamento da proposta, contrato, certidões e finalização.</p></article>
-      <article class="service-card reveal">🤝<h3>Investidores</h3><p>Curadoria de oportunidades com foco em liquidez e valorização.</p></article>
-    </div>
-  </section>
-
-  <section class="section finance reveal">
-    <div><p class="eyebrow">Simulação</p><h2>Simule seu financiamento</h2><p>Área visual demonstrativa para captação de leads.</p></div>
-    <form class="finance-form"><input placeholder="Valor do imóvel"><input placeholder="Entrada"><input placeholder="Prazo"><button class="btn primary" type="submit">Simular financiamento</button></form>
-  </section>
-
-  <section id="depoimentos" class="section testimonial reveal">
-    <p class="quote">“Profissionalismo, atenção aos detalhes e total dedicação. Encontramos o imóvel perfeito com toda segurança e tranquilidade.”</p>
-    <strong>Juliana M.</strong><span>Cliente satisfeita</span>
-  </section>
-
-  <section id="contato" class="section contact">
-    <div class="reveal"><p class="eyebrow">Contato</p><h2>Pronto para encontrar o imóvel ideal?</h2><p>Solicite uma consultoria personalizada.</p></div>
-    <form class="contact-form reveal" name="contato">
-      <input name="nome" placeholder="Seu nome" required>
-      <input name="telefone" placeholder="WhatsApp" required>
-      <input name="interesse" placeholder="Tipo de imóvel desejado">
-      <textarea name="mensagem" placeholder="Mensagem"></textarea>
-      <button class="btn primary" type="submit">Enviar mensagem pelo WhatsApp</button>
-    </form>
-  </section>
-
-  <footer><p id="footerText">© 2026 Ricardo Almeida · Corretor de Imóveis · CRECI 123456-F</p></footer>
-  <script src="assets/js/main.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="assets/js/supabase-config.js"></script>
-<script src="assets/js/script.js?v=20260510-rodape-final"></script>
+  <footer>© <span id="year"></span> <span data-setting="site_name">Ricardo Almeida</span>. Projeto compatível com Cloudflare Pages.</footer>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/assets/js/config.js"></script>
+  <script src="/assets/js/app.js"></script>
 </body>
 </html>

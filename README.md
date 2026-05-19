@@ -18,3 +18,6 @@ Projeto estático, sem Netlify, pronto para publicar no Cloudflare Pages via Git
 
 ## Busca de imóveis na internet
 Sem API paga, o sistema abre uma pesquisa estruturada no Google com os filtros escolhidos. Para anúncios externos, o corretor pode cadastrar o link do anúncio no painel.
+
+
+Correção de rota administrativa: a área do corretor funciona em /admin/ e também em /admin.html. Não use arquivo _redirects neste projeto.
