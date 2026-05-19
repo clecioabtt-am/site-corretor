@@ -1,17 +1,19 @@
 -- Projeto Oclesio Araújo Jr Imóveis - Supabase completo
+-- Rode este arquivo uma única vez no SQL Editor do Supabase.
 create extension if not exists "pgcrypto";
 
 create table if not exists public.site_config (
   id int primary key default 1,
   site_title text default 'Oclesio Araújo Jr Imóveis',
-  whatsapp text default '5592999999999',
+  whatsapp text default '5592982452810',
+  creci text default 'CRECI-AM 7423',
   hero_title text default 'Especializado em imóveis residenciais e comerciais',
   hero_subtitle text default 'Excelência, confiança e atendimento personalizado para encontrar o imóvel ideal.',
   primary_color text default '#2f5877',
   logo_url text,
   updated_at timestamptz default now()
 );
-insert into public.site_config (id) values (1) on conflict (id) do nothing;
+insert into public.site_config (id, whatsapp, creci) values (1, '5592982452810', 'CRECI-AM 7423') on conflict (id) do nothing;
 
 create table if not exists public.properties (
   id uuid primary key default gen_random_uuid(),
@@ -54,6 +56,11 @@ create table if not exists public.leads (
   created_at timestamptz default now()
 );
 
+-- Bucket público para fotos dos imóveis
+insert into storage.buckets (id, name, public)
+values ('imoveis', 'imoveis', true)
+on conflict (id) do update set public = true;
+
 alter table public.site_config enable row level security;
 alter table public.properties enable row level security;
 alter table public.property_images enable row level security;
@@ -79,9 +86,14 @@ create policy "Public insert leads" on public.leads for insert with check (true)
 drop policy if exists "Admin read leads" on public.leads;
 create policy "Admin read leads" on public.leads for select using (auth.role()='authenticated');
 
-insert into public.properties (titulo,tipo,finalidade,status,cidade,bairro,valor,area,quartos,banheiros,vagas,imagem,descricao,destaque) values
-('Casa à venda em Ponta Negra','Casa','venda','disponivel','Manaus','Ponta Negra',3200000,450,4,6,4,'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80','Casa ampla com piscina, área gourmet e acabamento premium.',true),
-('Apartamento à venda em Aleixo','Apartamento','venda','disponivel','Manaus','Aleixo',3000000,384,4,5,3,'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=80','Apartamento sofisticado com vista privilegiada e alto padrão.',true),
-('Terreno à venda em Ponta Negra','Terreno','venda','disponivel','Manaus','Ponta Negra',230000,250,0,0,0,'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=80','Terreno em localização estratégica para investimento.',true),
-('Apartamento para locação em Nossa Senhora das Graças','Apartamento','aluguel','disponivel','Manaus','Nossa Senhora das Graças',3600,70,2,2,1,'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=80','Apartamento confortável e bem localizado.',false)
-on conflict do nothing;
+drop policy if exists "Public read imoveis storage" on storage.objects;
+create policy "Public read imoveis storage" on storage.objects for select using (bucket_id = 'imoveis');
+drop policy if exists "Admin upload imoveis storage" on storage.objects;
+create policy "Admin upload imoveis storage" on storage.objects for insert with check (auth.role()='authenticated' and bucket_id = 'imoveis');
+drop policy if exists "Admin update imoveis storage" on storage.objects;
+create policy "Admin update imoveis storage" on storage.objects for update using (auth.role()='authenticated' and bucket_id = 'imoveis');
+drop policy if exists "Admin delete imoveis storage" on storage.objects;
+create policy "Admin delete imoveis storage" on storage.objects for delete using (auth.role()='authenticated' and bucket_id = 'imoveis');
+
+-- Observação: este arquivo NÃO cadastra imóveis de exemplo.
+-- Assim, os bairros começam com 0 imóveis e os números sobem conforme o corretor cadastra imóveis no painel.
