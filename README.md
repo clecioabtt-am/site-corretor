@@ -1,30 +1,25 @@
-# Site Premium para Corretor de Imóveis
+# Site Corretor — versão Cloudflare Pages
 
-Projeto estático ajustado para **Cloudflare Pages**.
+Projeto revisado para Cloudflare Pages.
 
-## Publicação no Cloudflare Pages
+## Configuração recomendada no Cloudflare Pages
 
-1. Crie ou acesse seu repositório no GitHub.
-2. Envie todos os arquivos desta pasta para o repositório.
-3. No Cloudflare, acesse **Workers & Pages > Create > Pages**.
-4. Escolha **Connect to Git** e selecione o repositório.
-5. Configure assim:
-   - **Framework preset:** None / Nenhum
-   - **Build command:** deixe vazio
-   - **Build output directory:** `/` ou deixe como raiz do projeto
-6. Clique em **Save and Deploy**.
+- Framework preset: None
+- Build command: deixar em branco
+- Build output directory: `/` ou `.`
+- Root directory: `/`
 
-## Compatibilidade Cloudflare
+## Observações
 
-- Arquivos e atributos específicos de hospedagem anterior foram removidos.
-- O formulário funciona pelo JavaScript do projeto, sem dependência de recurso exclusivo de plataforma.
-- O contato continua funcionando pelo JavaScript do projeto, com envio para WhatsApp e tentativa de gravação no Supabase.
-- Os arquivos `_headers` e `_redirects` foram mantidos porque são compatíveis com Cloudflare Pages.
+- Arquivos do Netlify removidos.
+- `_redirects` removido para evitar loop no Cloudflare Pages.
+- O projeto é estático e pode subir sem variáveis de ambiente.
+- A conexão com Supabase usa `assets/js/supabase-config.js`.
 
-## Onde editar
+## Arquivos principais
 
-- Texto principal: `index.html`
-- Cores e visual: `assets/css/style.css`
-- Animações simples: `assets/js/main.js`
-- Integração Supabase: `assets/js/supabase-config.js`
-- WhatsApp padrão: edite o número no painel/Supabase ou no código, se necessário.
+- `index.html`: site público
+- `admin.html`: painel do corretor
+- `assets/js/supabase-config.js`: configuração pública do Supabase
+- `assets/js/script.js`: integração do site com Supabase
+- `assets/js/main.js`: menu e animações
