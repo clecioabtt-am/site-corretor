@@ -1,3 +1,0 @@
-window.SUPABASE_URL = 'https://lnlntgwfelmqqgmyrsax.supabase.co';
-window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxubG50Z3dmZWxtcXFnbXlyc2F4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMDcyMzAsImV4cCI6MjA5NDc4MzIzMH0.NZu10YqyWynAJUzDHPAXRPW-ZHYNsA7yC8GtUfjtO5Y';
-window.DEFAULT_WHATSAPP = '5592982452810';
