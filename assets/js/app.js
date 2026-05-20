@@ -19,6 +19,26 @@ let activeGalleryIndex=0;
 let activeGalleryImages=[];
 const escapeHtml=v=>String(v??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));
 
+async function loadSiteConfig(){
+  if(!db) return;
+  try{
+    const {data,error}=await db.from('site_config').select('*').eq('id',1).maybeSingle();
+    if(error || !data) return;
+    if(data.whatsapp) window.DEFAULT_WHATSAPP=String(data.whatsapp).replace(/\D/g,'');
+    if(data.primary_color) document.documentElement.style.setProperty('--blue',data.primary_color);
+    const portrait=document.querySelector('.portrait');
+    if(portrait && data.about_image_url){
+      portrait.style.backgroundImage=`url('${data.about_image_url}')`;
+      portrait.style.backgroundSize='cover';
+      portrait.style.backgroundPosition='center top';
+    }
+    const heroTitle=document.querySelector('.hero h1');
+    if(heroTitle && data.hero_title) heroTitle.textContent=data.hero_title;
+    const heroSub=document.querySelector('.hero p');
+    if(heroSub && data.hero_subtitle) heroSub.textContent=data.hero_subtitle;
+  }catch(e){console.warn('Configuração do site não carregada:',e.message)}
+}
+
 const norm=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
 function isDisponivel(p){return ['disponivel','disponível'].includes(norm(p.status));}
 function label(v){return String(v||'').trim();}
@@ -189,4 +209,4 @@ function closePropertyModal(){
   document.body.classList.remove('modalOpen');
 }
 
-loadProperties();
+loadSiteConfig().finally(loadProperties);

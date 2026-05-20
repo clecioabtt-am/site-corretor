@@ -61,6 +61,7 @@ create table if not exists public.site_config (
   hero_title text,
   hero_subtitle text,
   primary_color text,
+  about_image_url text,
   updated_at timestamptz default now()
 );
 
@@ -70,6 +71,7 @@ alter table public.site_config add column if not exists creci text;
 alter table public.site_config add column if not exists hero_title text;
 alter table public.site_config add column if not exists hero_subtitle text;
 alter table public.site_config add column if not exists primary_color text;
+alter table public.site_config add column if not exists about_image_url text default 'assets/img/oclesio-araujo-jr.png';
 alter table public.site_config add column if not exists updated_at timestamptz default now();
 
 insert into public.site_config (id, site_title, whatsapp, creci)

@@ -24,12 +24,24 @@ async function getProperties(){
   if(error) throw error;
   return data||[];
 }
+async function loadSettings(){
+  try{
+    const {data,error}=await sb.from('site_config').select('*').eq('id',1).maybeSingle();
+    if(error || !data || !settingsForm) return;
+    for(const el of settingsForm.elements){
+      if(!el.name || el.type==='file') continue;
+      if(data[el.name]!==undefined && data[el.name]!==null) el.value=data[el.name];
+    }
+  }catch(e){console.warn('Configurações não carregadas:',e.message)}
+}
+
 async function loadDash(){
   if(!sb)return;
   try{
     const data=await getProperties();
     currentItems=data;
     renderAdmin(data);
+    await loadSettings();
     const {data:leads}=await sb.from('leads').select('*').order('created_at',{ascending:false});
     leadList.innerHTML=(leads||[]).map(l=>`<p><b>${l.nome}</b> - ${l.telefone} - ${l.tipo||''}</p>`).join('')||'<p>Nenhum lead.</p>';
   }catch(error){alert('Erro ao carregar painel: '+error.message)}
@@ -134,5 +146,22 @@ propertyForm.addEventListener('submit',async e=>{
   propertyForm.querySelector('button[type="submit"]').textContent='Salvar imóvel';
   loadDash();
 });
-settingsForm.addEventListener('submit',async e=>{e.preventDefault(); if(!sb){alert(needConfig);return} const data=Object.fromEntries(new FormData(e.target)); const {error}=await sb.from('site_config').upsert({id:1,...data,updated_at:new Date().toISOString()}); if(error)return alert(error.message); alert('Configurações salvas!')});
+settingsForm.addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(!sb){alert(needConfig);return}
+  const fd=new FormData(e.target);
+  const data=Object.fromEntries(fd.entries());
+  delete data.about_image_file;
+  const file=e.target.querySelector('input[name="about_image_file"]')?.files?.[0];
+  try{
+    if(file){
+      const uploaded=await uploadFiles([file]);
+      if(uploaded[0]) data.about_image_url=uploaded[0];
+    }
+  }catch(err){return alert('Erro ao enviar foto do corretor: '+err.message)}
+  const {error}=await sb.from('site_config').upsert({id:1,...data,updated_at:new Date().toISOString()});
+  if(error)return alert(error.message);
+  alert('Configurações salvas!');
+  await loadSettings();
+});
 init();
