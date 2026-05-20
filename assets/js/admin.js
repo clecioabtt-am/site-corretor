@@ -40,7 +40,7 @@ function renderAdmin(items){
   stDisp.textContent=items.filter(i=>normalizeStatus(i.status)==='disponivel').length;
   stVend.textContent=items.filter(i=>normalizeStatus(i.status)==='vendido').length;
   stAlug.textContent=items.filter(i=>normalizeStatus(i.status)==='alugado').length;
-  adminList.innerHTML=items.map(i=>`<div class="adminItem"><div><b>${i.titulo||'Sem título'}</b><span>${i.bairro||'Sem bairro'} • ${i.status||'disponivel'} • ${i.finalidade||''}</span></div><div class="adminActions"><button type="button" data-edit="${i.id}">Editar</button><button type="button" data-delete="${i.id}">Remover</button></div></div>`).join('')||'<p>Nenhum imóvel cadastrado ainda.</p>';
+  adminList.innerHTML=items.map(i=>`<div class="adminItem"><div><b>${i.titulo||'Sem título'}</b><span>${i.bairro||'Sem bairro'} • ${i.endereco||'Sem endereço'} • ${i.status||'disponivel'} • ${i.finalidade||''}</span></div><div class="adminActions"><button type="button" data-edit="${i.id}">Editar</button><button type="button" data-delete="${i.id}">Remover</button></div></div>`).join('')||'<p>Nenhum imóvel cadastrado ainda.</p>';
 }
 function fillForm(item){
   editingId=item.id;
@@ -100,6 +100,7 @@ propertyForm.addEventListener('submit',async e=>{
     status:raw.status,
     cidade:raw.cidade||'Manaus',
     bairro:raw.bairro||'',
+    endereco:raw.endereco||'',
     valor:Number(raw.valor||0),
     area:Number(raw.area||0),
     area_m2:Number(raw.area||0),

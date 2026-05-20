@@ -53,6 +53,7 @@ function whatsappText(p){
 `+
     `Bairro: ${p.bairro||'-'}
 Cidade: ${p.cidade||'Manaus'}
+Endereço: ${p.endereco||'-'}
 `+
     `Finalidade: ${p.finalidade||'-'}
 Tipo: ${p.tipo||'-'}
@@ -67,6 +68,8 @@ Tipo: ${p.tipo||'-'}
     `${p.description||p.descricao ? `Descrição: ${p.description||p.descricao}` : ''}`;
 }
 function whatsappUrl(p){return `https://wa.me/${window.DEFAULT_WHATSAPP}?text=${encodeURIComponent(whatsappText(p))}`;}
+function mapsQuery(p){return [p.endereco,p.bairro,p.cidade||'Manaus','Amazonas','Brasil'].filter(Boolean).join(', ');}
+function mapsUrl(p){return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapsQuery(p))}`;}
 function render(list){
   const grid=document.querySelector('#propertyGrid'); if(!grid)return;
   const visible=list.filter(isDisponivel);
@@ -131,12 +134,13 @@ function ensurePropertyModal(){
   modal=document.createElement('div');
   modal.id='propertyModal';
   modal.className='propertyModal hidden';
-  modal.innerHTML=`<div class="modalBackdrop" data-close="1"></div><div class="modalBox"><button class="modalClose" data-close="1">×</button><div class="modalGallery"><button class="galleryNav prev" data-prev="1">‹</button><img id="modalImg" alt="Foto do imóvel"><button class="galleryNav next" data-next="1">›</button><div id="modalCounter" class="modalCounter"></div></div><div class="modalInfo"><small id="modalMeta"></small><h2 id="modalTitle"></h2><strong id="modalPrice"></strong><div id="modalDetails" class="modalDetails"></div><p id="modalDescription"></p><a id="modalWhatsapp" class="primary" target="_blank">Falar com o corretor no WhatsApp</a></div></div>`;
+  modal.innerHTML=`<div class="modalBackdrop" data-close="1"></div><div class="modalBox"><button class="modalClose" data-close="1">×</button><div class="modalGallery"><button class="galleryNav prev" data-prev="1">‹</button><img id="modalImg" alt="Foto do imóvel"><button class="galleryNav next" data-next="1">›</button><div id="modalCounter" class="modalCounter"></div></div><div class="modalInfo"><small id="modalMeta"></small><h2 id="modalTitle"></h2><strong id="modalPrice"></strong><div id="modalDetails" class="modalDetails"></div><p id="modalEndereco" class="modalEndereco"></p><p id="modalDescription"></p><div class="modalActions"><a id="modalWhatsapp" class="primary" target="_blank">Falar com o corretor no WhatsApp</a><button id="modalLocationBtn" class="locationBtn" type="button">📍 Ver localização</button></div><div id="mapBox" class="mapBox hidden"><iframe id="mapFrame" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe><a id="mapExternal" target="_blank">Abrir no Google Maps</a></div></div></div>`;
   document.body.appendChild(modal);
   modal.addEventListener('click',e=>{
     if(e.target.dataset.close) closePropertyModal();
     if(e.target.dataset.prev) slideModal(-1);
     if(e.target.dataset.next) slideModal(1);
+    if(e.target.id==='modalLocationBtn') toggleMapBox();
   });
   document.addEventListener('keydown',e=>{ if(!modal.classList.contains('hidden')&&e.key==='Escape') closePropertyModal(); });
   return modal;
@@ -152,6 +156,13 @@ function slideModal(dir){
   activeGalleryIndex=(activeGalleryIndex+dir+activeGalleryImages.length)%activeGalleryImages.length;
   updateModalImage();
 }
+
+function toggleMapBox(){
+  const box=document.querySelector('#mapBox');
+  if(!box) return;
+  box.classList.toggle('hidden');
+}
+
 function openPropertyModal(p){
   if(!p) return;
   const modal=ensurePropertyModal();
@@ -162,8 +173,13 @@ function openPropertyModal(p){
   document.querySelector('#modalMeta').textContent=`${p.bairro||'-'} • ${p.cidade||'Manaus'} • ${p.status||'Disponível'}`;
   document.querySelector('#modalPrice').textContent=money(p.valor||p.price);
   document.querySelector('#modalDetails').innerHTML=`<span>${p.tipo||'Imóvel'}</span><span>${p.finalidade||'-'}</span><span>${p.area_m2||p.area||0} m²</span><span>${p.quartos||0} quartos</span><span>${p.banheiros||0} banheiros</span><span>${p.vagas||0} vagas</span>`;
+  document.querySelector('#modalEndereco').textContent=p.endereco ? `📍 ${p.endereco}` : '📍 Endereço não informado.';
   document.querySelector('#modalDescription').textContent=p.description||p.descricao||'Sem descrição cadastrada.';
   document.querySelector('#modalWhatsapp').href=whatsappUrl(p);
+  const q=mapsQuery(p);
+  document.querySelector('#mapFrame').src=`https://www.google.com/maps?q=${encodeURIComponent(q)}&output=embed`;
+  document.querySelector('#mapExternal').href=mapsUrl(p);
+  document.querySelector('#mapBox')?.classList.add('hidden');
   updateModalImage();
   modal.classList.remove('hidden');
   document.body.classList.add('modalOpen');
