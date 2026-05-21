@@ -117,6 +117,19 @@ create policy "Public insert leads" on public.leads for insert with check (true)
 drop policy if exists "Authenticated read leads" on public.leads;
 create policy "Authenticated read leads" on public.leads for select using (auth.role()='authenticated');
 
+
+
+-- Leads: campos extras e gerenciamento pelo painel
+alter table public.leads add column if not exists cpf text;
+alter table public.leads add column if not exists finalidade text;
+alter table public.leads add column if not exists status text default 'novo';
+alter table public.leads add column if not exists property_id uuid;
+alter table public.leads add column if not exists property_title text;
+alter table public.leads add column if not exists property_url text;
+
+drop policy if exists "Authenticated manage leads" on public.leads;
+create policy "Authenticated manage leads" on public.leads for all using (auth.role()='authenticated') with check (auth.role()='authenticated');
+
 insert into storage.buckets (id, name, public)
 values ('imoveis', 'imoveis', true)
 on conflict (id) do update set public = true;
