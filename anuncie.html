@@ -14,7 +14,7 @@
       <img class="brandLogo" src="assets/img/logo-arquipelago.jpeg" alt="Arquipélago Imobiliária">
       <span>
         <b>ARQUIPÉLAGO IMOBILIÁRIA</b>
-        <small>Oclesio Araújo Jr • Corretor de imóveis • CRECI-AM 7423</small>
+        <small>OCLESIO ARAÚJO JR • CORRETOR DE IMÓVEIS • CRECI-AM 7423</small>
       </span>
     </a>
 
@@ -26,33 +26,38 @@
 </header>
 
 <main class="announcePage">
-  <p class="breadcrumb">Home › Anuncie seu imóvel</p>
+  <div class="announceBox">
+    <p class="breadcrumb">Home › Anuncie seu imóvel</p>
 
-  <h1>Anuncie seu imóvel</h1>
-  <p>Preencha seus dados. O corretor entrará em contato para avaliar e divulgar seu imóvel.</p>
+    <h1>Anuncie seu imóvel</h1>
+    <p class="announceText">
+      Preencha seus dados. O corretor entrará em contato para avaliar e divulgar seu imóvel.
+    </p>
 
-  <form class="announceForm" id="announceForm">
-    <input name="nome" placeholder="Nome" required>
-    <input name="cpf" placeholder="CPF/CNPJ">
-    <input name="telefone" placeholder="Telefone" required>
-    <input name="email" placeholder="E-mail">
-    
-    <select name="tipo">
-      <option>Casa</option>
-      <option>Apartamento</option>
-      <option>Terreno</option>
-      <option>Sala Comercial</option>
-    </select>
+    <form class="announceForm" id="announceForm">
+      <input name="nome" placeholder="Nome" required>
+      <input name="cpf" placeholder="CPF/CNPJ">
 
-    <select name="finalidade">
-      <option>Venda</option>
-      <option>Aluguel</option>
-    </select>
+      <input name="telefone" placeholder="Telefone" required>
+      <input name="email" placeholder="E-mail">
 
-    <textarea name="mensagem" placeholder="Descreva seu imóvel"></textarea>
+      <select name="tipo">
+        <option>Casa</option>
+        <option>Apartamento</option>
+        <option>Terreno</option>
+        <option>Sala Comercial</option>
+      </select>
 
-    <button type="submit">Enviar interesse</button>
-  </form>
+      <select name="finalidade">
+        <option>Venda</option>
+        <option>Aluguel</option>
+      </select>
+
+      <textarea name="mensagem" placeholder="Descreva seu imóvel"></textarea>
+
+      <button type="submit">Enviar interesse</button>
+    </form>
+  </div>
 </main>
 
 <footer>
