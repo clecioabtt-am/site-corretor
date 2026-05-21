@@ -3,178 +3,56 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Arquipélago Imobiliária | Oclesio Araújo Jr</title>
-  <meta name="description" content="Compre, alugue e anuncie imóveis em Manaus com Arquipélago Imobiliária e Oclesio Araújo Jr.">
-  <link rel="preconnect" href="https://images.unsplash.com">
+  <title>Anuncie seu imóvel | Arquipélago Imobiliária</title>
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
 <body>
-<header class="hero" id="inicio">
-  <nav class="topbar">
-    <a class="brand" href="#inicio">
+<header class="pageHeader">
+  <nav class="topbar light">
+    <a class="brand" href="index.html">
       <img class="brandLogo" src="assets/img/logo-arquipelago.jpeg" alt="Arquipélago Imobiliária">
       <span>
         <b>ARQUIPÉLAGO IMOBILIÁRIA</b>
-        <small>Oclesio Araújo Jr • CRECI-AM 7423</small>
+        <small>Oclesio Araújo Jr • Corretor de imóveis • CRECI-AM 7423</small>
       </span>
     </a>
 
     <div class="navlinks">
-      <a href="#imoveis">Imóveis</a>
-      <a href="#bairros">Bairros</a>
-      <a href="#simulador">Simulador</a>
-      <a href="#sobre">Sobre</a>
-      <a href="anuncie.html">Anuncie seu imóvel</a>
-      <a href="admin/" class="adminlink">Área do Corretor</a>
+      <a href="index.html">Home</a>
+      <a href="admin/">Área do Corretor</a>
     </div>
-
-    <a class="pill" id="topWhats" href="https://wa.me/5592982452810">WhatsApp</a>
-    <button class="menu" onclick="document.body.classList.toggle('open')">☰</button>
   </nav>
-
-  <section class="heroContent">
-    <div class="logoBig logoBigImage">
-      <img src="assets/img/logo-arquipelago.jpeg" alt="Arquipélago Imobiliária">
-    </div>
-
-    <h1>Especializado em imóveis residenciais e comerciais</h1>
-
-    <div class="toggle">
-      <button class="active" data-purpose="venda">Comprar</button>
-      <button data-purpose="aluguel">Alugar</button>
-    </div>
-
-    <form class="searchbar" id="heroSearch">
-      <select id="heroType">
-        <option value="">Tipo</option>
-        <option>Casa</option>
-        <option>Apartamento</option>
-        <option>Terreno</option>
-        <option>Sala Comercial</option>
-      </select>
-      <input id="heroText" placeholder="Procure por cidade, bairro, condomínio ou código">
-      <button>🔎</button>
-    </form>
-  </section>
 </header>
 
-<main>
-  <section class="benefits">
-    <article>
-      <h3>Os melhores imóveis</h3>
-      <p>Escolha entre casas, apartamentos, salas e terrenos em Manaus.</p>
-    </article>
+<main class="announcePage">
+  <p class="breadcrumb">Home › Anuncie seu imóvel</p>
 
-    <article>
-      <h3>Vamos acompanhar você</h3>
-      <p>Consultoria completa na escolha da localização, tipo e características.</p>
-    </article>
+  <h1>Anuncie seu imóvel</h1>
+  <p>Preencha seus dados. O corretor entrará em contato para avaliar e divulgar seu imóvel.</p>
 
-    <article>
-      <h3>Sempre a melhor condição</h3>
-      <p>Apoio estratégico para negociação, financiamento e fechamento.</p>
-    </article>
-  </section>
+  <form class="announceForm" id="announceForm">
+    <input name="nome" placeholder="Nome" required>
+    <input name="cpf" placeholder="CPF/CNPJ">
+    <input name="telefone" placeholder="Telefone" required>
+    <input name="email" placeholder="E-mail">
+    
+    <select name="tipo">
+      <option>Casa</option>
+      <option>Apartamento</option>
+      <option>Terreno</option>
+      <option>Sala Comercial</option>
+    </select>
 
-  <section class="section featured" id="imoveis">
-    <div class="sectionTitle">
-      <small>Vitrine Premium</small>
-      <h2>Imóveis em destaque</h2>
-    </div>
+    <select name="finalidade">
+      <option>Venda</option>
+      <option>Aluguel</option>
+    </select>
 
-    <div class="filters">
-      <select id="filterPurpose">
-        <option value="">Finalidade</option>
-        <option value="venda">Venda</option>
-        <option value="aluguel">Aluguel</option>
-      </select>
+    <textarea name="mensagem" placeholder="Descreva seu imóvel"></textarea>
 
-      <select id="filterType">
-        <option value="">Tipo</option>
-        <option>Casa</option>
-        <option>Apartamento</option>
-        <option>Terreno</option>
-        <option>Sala Comercial</option>
-      </select>
-
-      <input id="filterDistrict" placeholder="Bairro">
-      <input id="filterMax" type="number" placeholder="Valor máximo">
-      <button id="clearFilters">Limpar</button>
-    </div>
-
-    <div class="cards" id="propertyGrid"></div>
-  </section>
-
-  <section class="neighborhoods" id="bairros">
-    <div>
-      <h2>+ Bairros para você</h2>
-      <p>Somos especialistas nos bairros mais procurados de Manaus.</p>
-    </div>
-
-    <div class="bairroGrid" id="bairroGrid">
-      <a data-bairro="Ponta Negra"><span>Ponta Negra</span><small>0 imóveis</small></a>
-      <a data-bairro="Adrianópolis"><span>Adrianópolis</span><small>0 imóveis</small></a>
-      <a data-bairro="Dom Pedro"><span>Dom Pedro</span><small>0 imóveis</small></a>
-      <a data-bairro="Flores"><span>Flores</span><small>0 imóveis</small></a>
-      <a data-bairro="Aleixo"><span>Aleixo</span><small>0 imóveis</small></a>
-      <a data-bairro="Parque 10"><span>Parque 10</span><small>0 imóveis</small></a>
-      <a data-bairro="Cidade Nova"><span>Cidade Nova</span><small>0 imóveis</small></a>
-      <a data-bairro="Coroado"><span>Coroado</span><small>0 imóveis</small></a>
-    </div>
-  </section>
-
-  <section class="simulator" id="simulador">
-    <div>
-      <h2>Simulador</h2>
-      <p>Simule o financiamento do seu imóvel e tenha uma estimativa da parcela.</p>
-
-      <label>Preço do Imóvel <b id="priceLabel">R$ 600.000</b>
-        <input type="range" id="priceRange" min="150000" max="3000000" step="10000" value="600000">
-      </label>
-
-      <label>Entrada <b id="downLabel">30%</b>
-        <input type="range" id="downRange" min="10" max="80" value="30">
-      </label>
-
-      <label>Taxa de Juros <b id="rateLabel">11% /ano</b>
-        <input type="range" id="rateRange" min="5" max="18" step="0.1" value="11">
-      </label>
-
-      <label>Tempo <b id="yearsLabel">30 anos</b>
-        <input type="range" id="yearsRange" min="5" max="35" value="30">
-      </label>
-    </div>
-
-    <div class="circle">
-      <span>Valor da 1ª parcela</span>
-      <strong id="parcelValue">R$ 4.835/mês</strong>
-      <small>Estimativa SAC/Price para planejamento inicial</small>
-      <a href="#imoveis">Ver imóveis</a>
-    </div>
-  </section>
-
-  <section class="about" id="sobre">
-    <div class="portrait"></div>
-
-    <div>
-      <small>Sobre mim</small>
-      <h2>Oclesio Araújo Jr</h2>
-      <p>Corretor de imóveis em Manaus com atendimento transparente, consultivo e focado em encontrar o imóvel certo para compra, venda ou locação.</p>
-
-      <ul>
-        <li>Atendimento personalizado do início ao fim</li>
-        <li>Captação e divulgação profissional de imóveis</li>
-        <li>Consultoria para compra, aluguel e investimento</li>
-      </ul>
-    </div>
-  </section>
-
-  <section class="announce">
-    <h2>Anuncie seu imóvel</h2>
-    <p>Cadastre seu imóvel para avaliação e divulgação profissional.</p>
-    <a class="primary" href="anuncie.html">Anunciar agora</a>
-  </section>
+    <button type="submit">Enviar interesse</button>
+  </form>
 </main>
 
 <footer>
@@ -187,21 +65,22 @@
     </p>
   </div>
 
-  <div>
+  <div style="text-align:center;">
     <b>Contato</b>
-    <p>(92) 98245-2810<br>atendimento@oclesioimoveis.com</p>
+    <p>
+      (92) 98245-2810<br>
+      Manaus - AM
+    </p>
   </div>
 
-  <div>
-    <b>Acesso</b>
-    <p><a href="admin/">Área do Corretor</a></p>
+  <div style="text-align:center;">
+    <b>Arquipélago Imobiliária</b>
+    <p>Sua jornada imobiliária começa aqui!</p>
   </div>
 </footer>
 
-<a class="float" href="https://wa.me/5592982452810">💬</a>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/js/config.js"></script>
-<script src="assets/js/app.js"></script>
+<script src="assets/js/anuncie.js"></script>
 </body>
 </html>
