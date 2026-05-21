@@ -25,3 +25,7 @@ Projeto estático premium compatível com Cloudflare Pages + GitHub Auto Deploy 
 
 ## Importante
 Não existe `_redirects`, `netlify.toml` ou dependência Netlify neste projeto.
+
+
+## Pesquisa Chaves na Mão
+O painel do corretor possui uma aba exclusiva "Pesquisa Chaves na Mão" dentro de Pesquisa Inteligente. Ela usa os filtros preenchidos para montar URLs filtradas no site chavesnamao.com.br, sem API e sem scraping.

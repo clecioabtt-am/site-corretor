@@ -209,11 +209,52 @@ function renderSmartResults(items){
   if(!items.length){ box.innerHTML='<p class="muted">Nenhum imóvel cadastrado encontrado para esses filtros.</p>'; return; }
   box.innerHTML=items.map(i=>`<div class="smartItem"><div><b>${i.titulo||i.title||'Sem título'}</b><span>${i.tipo||'Imóvel'} • ${i.finalidade||'-'} • ${i.status||'-'} • ${i.bairro||'Sem bairro'} • ${smartMoney(i.valor||i.price)}</span></div><div class="adminActions"><button type="button" data-edit="${i.id}">Editar</button></div></div>`).join('');
 }
+
+function chavesSlug(v){
+  return String(v||'')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g,'-')
+    .replace(/^-+|-+$/g,'');
+}
+function chavesTipoSlug(tipo, finalidade){
+  const t=smartNorm(tipo||'casa');
+  const f=smartNorm(finalidade)==='aluguel'?'para-alugar':'a-venda';
+  if(t.includes('apart')) return `apartamentos-${f}`;
+  if(t.includes('terreno') || t.includes('lote')) return `terrenos-${f}`;
+  if(t.includes('sala') || t.includes('comercial')) return `salas-comerciais-${f}`;
+  return `casas-${f}`;
+}
+function chavesUrlFromFilters(f){
+  const tipo=chavesTipoSlug(f.tipo,f.finalidade);
+  const cidade=chavesSlug(f.cidade||'Manaus');
+  const bairro=chavesSlug(f.bairro||'');
+  const quartos=Number(f.quartos_min||0);
+  let url=`https://www.chavesnamao.com.br/${tipo}/am-${cidade}/`;
+  if(bairro) url += `${bairro}/`;
+  if(quartos>0) url += `${quartos}-quartos/`;
+  return url;
+}
+function renderChavesSearch(f){
+  const box=document.getElementById('chavesLinks');
+  if(!box) return;
+  const q=smartQueryText(f)||'imóveis em Manaus';
+  const main=chavesUrlFromFilters(f);
+  const google=`https://www.google.com/search?q=${encodeURIComponent('site:chavesnamao.com.br '+q)}`;
+  const broad=`https://www.chavesnamao.com.br/imoveis/am-manaus/?q=${encodeURIComponent(q)}`;
+  box.innerHTML=`
+    <a class="externalLink chavesMain" href="${main}" target="_blank" rel="noopener"><b>🔎 Abrir no Chaves na Mão</b><span>${main}</span></a>
+    <a class="externalLink" href="${google}" target="_blank" rel="noopener"><b>Google dentro do Chaves</b><span>${q}</span></a>
+    <a class="externalLink" href="${broad}" target="_blank" rel="noopener"><b>Busca ampla Chaves</b><span>${q}</span></a>
+  `;
+}
+
 function runSmartSearch(){
   const f=smartFormData();
   const results=(currentItems||[]).filter(p=>matchSmartProperty(p,f));
   renderSmartResults(results);
   renderSmartExternal(f);
+  renderChavesSearch(f);
 }
 function setupSmartSearch(){
   const form=document.getElementById('smartSearchForm');
@@ -227,6 +268,7 @@ function setupSmartSearch(){
     const target=btn.dataset.smartTab;
     document.getElementById('smartInternal')?.classList.toggle('hidden',target!=='interna');
     document.getElementById('smartExternal')?.classList.toggle('hidden',target!=='externa');
+    document.getElementById('smartChaves')?.classList.toggle('hidden',target!=='chaves');
     runSmartSearch();
   }));
   runSmartSearch();
