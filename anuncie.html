@@ -1,44 +1,72 @@
 <!doctype html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Anuncie seu imóvel | Arquipélago Imobiliária</title>
+
+  <title>Anuncie seu imóvel | Oclesio Araújo Jr</title>
+
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
-<body>
-<header class="pageHeader">
-  <nav class="topbar light">
+<body class="light">
+
+  <nav class="topbar lightbar">
+
     <a class="brand" href="index.html">
-      <img class="brandLogo" src="assets/img/logo-arquipelago.jpeg" alt="Arquipélago Imobiliária">
+
+      <!-- LOGO -->
+      <img 
+        src="assets/img/logo-arquipelago.jpeg"
+        alt="Arquipélago Imobiliária"
+        style="
+          width:70px;
+          height:70px;
+          object-fit:cover;
+          border-radius:18px;
+          margin-right:14px;
+          box-shadow:0 4px 15px rgba(0,0,0,.15);
+        "
+      >
+
       <span>
         <b>ARQUIPÉLAGO IMOBILIÁRIA</b>
-        <small>OCLESIO ARAÚJO JR • CORRETOR DE IMÓVEIS • CRECI-AM 7423</small>
+
+        <small>
+          OCLESIO ARAÚJO JR • CORRETOR DE IMÓVEIS • CRECI-AM 7423
+        </small>
       </span>
+
     </a>
 
     <div class="navlinks">
       <a href="index.html">Home</a>
       <a href="admin/">Área do Corretor</a>
     </div>
-  </nav>
-</header>
 
-<main class="announcePage">
-  <div class="announceBox">
-    <p class="breadcrumb">Home › Anuncie seu imóvel</p>
+  </nav>
+
+  <main class="page">
+
+    <p class="crumb">
+      Home › Anuncie seu imóvel
+    </p>
 
     <h1>Anuncie seu imóvel</h1>
-    <p class="announceText">
+
+    <p>
       Preencha seus dados. O corretor entrará em contato para avaliar e divulgar seu imóvel.
     </p>
 
-    <form class="announceForm" id="announceForm">
+    <form class="formCard" id="leadForm">
+
       <input name="nome" placeholder="Nome" required>
+
       <input name="cpf" placeholder="CPF/CNPJ">
 
       <input name="telefone" placeholder="Telefone" required>
+
       <input name="email" placeholder="E-mail">
 
       <select name="tipo">
@@ -49,43 +77,87 @@
       </select>
 
       <select name="finalidade">
-        <option>Venda</option>
-        <option>Aluguel</option>
+        <option value="venda">Venda</option>
+        <option value="aluguel">Aluguel</option>
       </select>
 
-      <textarea name="mensagem" placeholder="Descreva seu imóvel"></textarea>
+      <textarea 
+        name="mensagem"
+        placeholder="Descreva seu imóvel"
+      ></textarea>
 
-      <button type="submit">Enviar interesse</button>
+      <button>
+        Enviar interesse
+      </button>
+
     </form>
-  </div>
-</main>
 
-<footer>
-  <div style="text-align:center;">
-    <img src="assets/img/logo-arquipelago.jpeg" alt="Arquipélago Imobiliária" style="width:90px; border-radius:18px; margin-bottom:14px;">
-    <h3 style="margin:0; text-align:center;">OCLESIO ARAÚJO JR</h3>
-    <p style="text-align:center; margin-top:8px;">
-      Corretor de imóveis<br>
-      CRECI-AM 7423
-    </p>
-  </div>
+  </main>
 
-  <div style="text-align:center;">
-    <b>Contato</b>
-    <p>
-      (92) 98245-2810<br>
-      Manaus - AM
-    </p>
-  </div>
+  <footer style="
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:30px;
+    padding:50px 20px;
+  ">
 
-  <div style="text-align:center;">
-    <b>Arquipélago Imobiliária</b>
-    <p>Sua jornada imobiliária começa aqui!</p>
-  </div>
-</footer>
+    <!-- BLOCO LOGO -->
+    <div style="text-align:center;">
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="assets/js/config.js"></script>
-<script src="assets/js/anuncie.js"></script>
+      <img 
+        src="assets/img/logo-arquipelago.jpeg"
+        alt="Arquipélago Imobiliária"
+        style="
+          width:90px;
+          border-radius:20px;
+          margin-bottom:15px;
+          box-shadow:0 5px 20px rgba(0,0,0,.20);
+        "
+      >
+
+      <h3 style="margin:0;">
+        OCLESIO ARAÚJO JR
+      </h3>
+
+      <p style="margin-top:10px;">
+        Corretor de imóveis<br>
+        CRECI-AM 7423
+      </p>
+
+    </div>
+
+    <!-- CONTATO -->
+    <div style="text-align:center;">
+
+      <b>Contato</b>
+
+      <p>
+        (92) 98245-2810<br>
+        Manaus - AM
+      </p>
+
+    </div>
+
+    <!-- EMPRESA -->
+    <div style="text-align:center;">
+
+      <b>Arquipélago Imobiliária</b>
+
+      <p>
+        Sua jornada imobiliária começa aqui!
+      </p>
+
+    </div>
+
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script src="assets/js/config.js"></script>
+
+  <script src="assets/js/app.js"></script>
+
 </body>
 </html>
