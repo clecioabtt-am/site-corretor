@@ -165,3 +165,70 @@ settingsForm.addEventListener('submit',async e=>{
   await loadSettings();
 });
 init();
+
+// Pesquisa inteligente: busca interna no Supabase + links externos sem API
+const SMART_PORTALS = [
+  {name:'Google', url:q=>`https://www.google.com/search?q=${encodeURIComponent(q)}`},
+  {name:'OLX', url:q=>`https://www.olx.com.br/imoveis?q=${encodeURIComponent(q)}`},
+  {name:'Zap Imóveis', url:q=>`https://www.zapimoveis.com.br/busca/imoveis/?q=${encodeURIComponent(q)}`},
+  {name:'VivaReal', url:q=>`https://www.vivareal.com.br/busca/?q=${encodeURIComponent(q)}`},
+  {name:'Imovelweb', url:q=>`https://www.imovelweb.com.br/propriedades-q-${encodeURIComponent(q).replace(/%20/g,'-')}.html`},
+  {name:'Facebook Marketplace', url:q=>`https://www.facebook.com/marketplace/search/?query=${encodeURIComponent(q)}`}
+];
+function smartNorm(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();}
+function smartMoney(n){return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}).format(Number(n||0));}
+function smartFormData(){
+  const form=document.getElementById('smartSearchForm');
+  return form?Object.fromEntries(new FormData(form).entries()):{};
+}
+function smartQueryText(f){
+  const partes=[f.tipo, f.finalidade, f.bairro, f.cidade||'Manaus', f.keyword, f.valor_max?`até ${smartMoney(f.valor_max)}`:'', f.quartos_min?`${f.quartos_min} quartos`:'' ];
+  return partes.filter(Boolean).join(' ');
+}
+function matchSmartProperty(p,f){
+  const hay=smartNorm([p.titulo,p.title,p.tipo,p.finalidade,p.status,p.cidade,p.bairro,p.endereco,p.descricao,p.description].filter(Boolean).join(' '));
+  if(f.keyword && !hay.includes(smartNorm(f.keyword))) return false;
+  if(f.tipo && smartNorm(p.tipo)!==smartNorm(f.tipo)) return false;
+  if(f.finalidade && smartNorm(p.finalidade)!==smartNorm(f.finalidade)) return false;
+  if(f.status && smartNorm(p.status)!==smartNorm(f.status)) return false;
+  if(f.cidade && !smartNorm(p.cidade||'Manaus').includes(smartNorm(f.cidade))) return false;
+  if(f.bairro && !smartNorm(p.bairro).includes(smartNorm(f.bairro))) return false;
+  if(f.valor_max && Number(p.valor||p.price||0)>Number(f.valor_max)) return false;
+  if(f.quartos_min && Number(p.quartos||0)<Number(f.quartos_min)) return false;
+  return true;
+}
+function renderSmartExternal(f){
+  const box=document.getElementById('externalLinks');
+  if(!box) return;
+  const q=smartQueryText(f)||'imóveis em Manaus';
+  box.innerHTML=SMART_PORTALS.map(portal=>`<a class="externalLink" href="${portal.url(q)}" target="_blank" rel="noopener"><b>${portal.name}</b><span>${q}</span></a>`).join('');
+}
+function renderSmartResults(items){
+  const box=document.getElementById('smartResults');
+  if(!box) return;
+  if(!items.length){ box.innerHTML='<p class="muted">Nenhum imóvel cadastrado encontrado para esses filtros.</p>'; return; }
+  box.innerHTML=items.map(i=>`<div class="smartItem"><div><b>${i.titulo||i.title||'Sem título'}</b><span>${i.tipo||'Imóvel'} • ${i.finalidade||'-'} • ${i.status||'-'} • ${i.bairro||'Sem bairro'} • ${smartMoney(i.valor||i.price)}</span></div><div class="adminActions"><button type="button" data-edit="${i.id}">Editar</button></div></div>`).join('');
+}
+function runSmartSearch(){
+  const f=smartFormData();
+  const results=(currentItems||[]).filter(p=>matchSmartProperty(p,f));
+  renderSmartResults(results);
+  renderSmartExternal(f);
+}
+function setupSmartSearch(){
+  const form=document.getElementById('smartSearchForm');
+  if(!form) return;
+  form.addEventListener('submit',e=>{e.preventDefault();runSmartSearch();});
+  form.addEventListener('input',()=>runSmartSearch());
+  document.getElementById('clearSmartSearch')?.addEventListener('click',()=>{form.reset(); const cidade=form.querySelector('[name="cidade"]'); if(cidade) cidade.value='Manaus'; runSmartSearch();});
+  document.querySelectorAll('[data-smart-tab]').forEach(btn=>btn.addEventListener('click',()=>{
+    document.querySelectorAll('[data-smart-tab]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const target=btn.dataset.smartTab;
+    document.getElementById('smartInternal')?.classList.toggle('hidden',target!=='interna');
+    document.getElementById('smartExternal')?.classList.toggle('hidden',target!=='externa');
+    runSmartSearch();
+  }));
+  runSmartSearch();
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setupSmartSearch); else setupSmartSearch();
