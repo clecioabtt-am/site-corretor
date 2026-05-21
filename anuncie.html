@@ -1,1 +1,86 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Anuncie seu imóvel | Oclesio Araújo Jr</title><link rel="stylesheet" href="assets/css/style.css"></head><body class="light"><nav class="topbar lightbar"><a class="brand" href="index.html"><span class="mark">OA</span><span><b>OCLESIO ARAÚJO JR</b><small>Corretor de imóveis</small></span></a><div class="navlinks"><a href="index.html">Home</a><a href="admin/">Área do Corretor</a></div></nav><main class="page"><p class="crumb">Home › Anuncie seu imóvel</p><h1>Anuncie seu imóvel</h1><p>Preencha seus dados. O corretor entrará em contato para avaliar e divulgar seu imóvel.</p><form class="formCard" id="leadForm"><input name="nome" placeholder="Nome" required><input name="cpf" placeholder="CPF/CNPJ"><input name="telefone" placeholder="Telefone" required><input name="email" placeholder="E-mail"><select name="tipo"><option>Casa</option><option>Apartamento</option><option>Terreno</option><option>Sala Comercial</option></select><select name="finalidade"><option value="venda">Venda</option><option value="aluguel">Aluguel</option></select><textarea name="mensagem" placeholder="Descreva seu imóvel"></textarea><button>Enviar interesse</button></form></main><footer><b>OCLESIO ARAÚJO JR</b><p>Manaus - AM</p></footer><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="assets/js/config.js"></script><script src="assets/js/app.js"></script></body></html>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Anuncie seu imóvel | Arquipélago Imobiliária</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+<header class="pageHeader">
+  <nav class="topbar light">
+    <a class="brand" href="index.html">
+      <img class="brandLogo" src="assets/img/logo-arquipelago.jpeg" alt="Arquipélago Imobiliária">
+      <span>
+        <b>ARQUIPÉLAGO IMOBILIÁRIA</b>
+        <small>Oclesio Araújo Jr • Corretor de imóveis • CRECI-AM 7423</small>
+      </span>
+    </a>
+
+    <div class="navlinks">
+      <a href="index.html">Home</a>
+      <a href="admin/">Área do Corretor</a>
+    </div>
+  </nav>
+</header>
+
+<main class="announcePage">
+  <p class="breadcrumb">Home › Anuncie seu imóvel</p>
+
+  <h1>Anuncie seu imóvel</h1>
+  <p>Preencha seus dados. O corretor entrará em contato para avaliar e divulgar seu imóvel.</p>
+
+  <form class="announceForm" id="announceForm">
+    <input name="nome" placeholder="Nome" required>
+    <input name="cpf" placeholder="CPF/CNPJ">
+    <input name="telefone" placeholder="Telefone" required>
+    <input name="email" placeholder="E-mail">
+    
+    <select name="tipo">
+      <option>Casa</option>
+      <option>Apartamento</option>
+      <option>Terreno</option>
+      <option>Sala Comercial</option>
+    </select>
+
+    <select name="finalidade">
+      <option>Venda</option>
+      <option>Aluguel</option>
+    </select>
+
+    <textarea name="mensagem" placeholder="Descreva seu imóvel"></textarea>
+
+    <button type="submit">Enviar interesse</button>
+  </form>
+</main>
+
+<footer>
+  <div style="text-align:center;">
+    <img src="assets/img/logo-arquipelago.jpeg" alt="Arquipélago Imobiliária" style="width:90px; border-radius:18px; margin-bottom:14px;">
+    <h3 style="margin:0; text-align:center;">OCLESIO ARAÚJO JR</h3>
+    <p style="text-align:center; margin-top:8px;">
+      Corretor de imóveis<br>
+      CRECI-AM 7423
+    </p>
+  </div>
+
+  <div style="text-align:center;">
+    <b>Contato</b>
+    <p>
+      (92) 98245-2810<br>
+      Manaus - AM
+    </p>
+  </div>
+
+  <div style="text-align:center;">
+    <b>Arquipélago Imobiliária</b>
+    <p>Sua jornada imobiliária começa aqui!</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/anuncie.js"></script>
+</body>
+</html>
