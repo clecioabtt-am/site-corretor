@@ -84,12 +84,54 @@ adminList.addEventListener('click',async e=>{
   if(edit){ const item=currentItems.find(x=>x.id===edit.dataset.edit); if(item) fillForm(item); }
   if(del){ await removeProperty(del.dataset.delete); }
 });
+const IMAGE_UPLOAD_CONFIG={
+  maxWidth:1600,
+  maxHeight:2000,
+  quality:0.94,
+  outputType:'image/jpeg'
+};
+
+function resizeImageFile(file){
+  return new Promise((resolve,reject)=>{
+    if(!file || !file.type || !file.type.startsWith('image/')) return resolve(file);
+    const img=new Image();
+    const objectUrl=URL.createObjectURL(file);
+    img.onload=()=>{
+      URL.revokeObjectURL(objectUrl);
+      const ratio=Math.min(IMAGE_UPLOAD_CONFIG.maxWidth/img.width,IMAGE_UPLOAD_CONFIG.maxHeight/img.height,1);
+      const width=Math.round(img.width*ratio);
+      const height=Math.round(img.height*ratio);
+      const canvas=document.createElement('canvas');
+      canvas.width=width;
+      canvas.height=height;
+      const ctx=canvas.getContext('2d',{alpha:false});
+      ctx.fillStyle='#ffffff';
+      ctx.fillRect(0,0,width,height);
+      ctx.imageSmoothingEnabled=true;
+      ctx.imageSmoothingQuality='high';
+      ctx.drawImage(img,0,0,width,height);
+      canvas.toBlob(blob=>{
+        if(!blob) return reject(new Error('Não foi possível redimensionar a imagem.'));
+        const originalName=file.name.replace(/\.[^.]+$/,'');
+        const newName=`${originalName}-otimizada.jpg`;
+        resolve(new File([blob],newName,{type:IMAGE_UPLOAD_CONFIG.outputType,lastModified:Date.now()}));
+      },IMAGE_UPLOAD_CONFIG.outputType,IMAGE_UPLOAD_CONFIG.quality);
+    };
+    img.onerror=()=>{
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error(`Não foi possível ler a imagem: ${file.name}`));
+    };
+    img.src=objectUrl;
+  });
+}
+
 async function uploadFiles(files){
   const urls=[];
-  for(const file of files){
+  for(const originalFile of files){
+    const file=await resizeImageFile(originalFile);
     const safe=file.name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9._-]/g,'-');
     const path=`imoveis/${Date.now()}-${Math.random().toString(36).slice(2)}-${safe}`;
-    const {error}=await sb.storage.from('imoveis').upload(path,file,{cacheControl:'3600',upsert:false});
+    const {error}=await sb.storage.from('imoveis').upload(path,file,{cacheControl:'3600',upsert:false,contentType:file.type||'image/jpeg'});
     if(error) throw error;
     const {data}=sb.storage.from('imoveis').getPublicUrl(path);
     urls.push(data.publicUrl);
