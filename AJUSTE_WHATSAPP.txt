@@ -1,0 +1,2 @@
+Ajuste aplicado: todos os botões "Falar com o corretor no WhatsApp" direcionam para https://wa.me/5592982452810, número (92) 98245-2810.
+Também foi aplicado cache-busting nos arquivos JS/CSS para facilitar atualização no Cloudflare.
