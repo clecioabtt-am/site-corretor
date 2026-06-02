@@ -1,3 +1,16 @@
+
+// Ajuste 2026-06-01: garante que a imagem do modal apareça completa, sem corte,
+// mesmo se algum CSS antigo ficar em cache no navegador.
+(function ensureModalImageContain(){
+  const css = `.modalGallery img,#modalImg{object-fit:contain!important;object-position:center center!important;background:#10283a!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:72vh!important;}`;
+  if(!document.getElementById('modalImageContainFix')){
+    const style=document.createElement('style');
+    style.id='modalImageContainFix';
+    style.textContent=css;
+    document.head.appendChild(style);
+  }
+})();
+
 const isConfigured=()=>window.SUPABASE_URL&&!window.SUPABASE_URL.includes('COLE_AQUI')&&window.SUPABASE_ANON_KEY&&!window.SUPABASE_ANON_KEY.includes('COLE_AQUI');
 const db=isConfigured()?supabase.createClient(window.SUPABASE_URL,window.SUPABASE_ANON_KEY):null;
 let all=[];
