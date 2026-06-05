@@ -39,3 +39,16 @@
 .modalGallery img,#modalImg{width:100%!important;height:100%!important;max-width:100%!important;max-height:72vh!important;object-fit:contain!important;object-position:center center!important;background:#10283a!important;}
 @media(max-width:900px){.modalGallery img,#modalImg{max-height:56vh!important;}.modalGallery{min-height:360px!important;}}
 .imageResolutionHint{display:block;margin-top:8px;color:#64748b;font-size:13px;line-height:1.45;font-weight:700}.imageResolutionHint b{color:#2f5877}
+
+
+/* AJUSTE 2026-06-05: imagem ampliada, completa, com zoom e tela cheia */
+.propertyModal{padding:14px!important;}
+.modalBox{width:min(1280px,98vw)!important;max-height:96vh!important;grid-template-columns:minmax(520px,1.35fr) minmax(360px,.65fr)!important;}
+.modalGallery{min-height:82vh!important;max-height:96vh!important;overflow:auto!important;background:#10283a!important;}
+.modalGallery img,#modalImg{width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:contain!important;object-position:center center!important;background:#10283a!important;display:block!important;transition:width .18s ease,height .18s ease;}
+.modalGallery.zoomed{place-items:start center!important;}
+.galleryTools{position:absolute;left:50%;top:18px;transform:translateX(-50%);z-index:4;display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.56);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:8px;box-shadow:0 14px 34px rgba(0,0,0,.22)}
+.galleryTools button{border:0;border-radius:999px;background:rgba(255,255,255,.92);color:#173a56;font-weight:900;padding:9px 13px;cursor:pointer;line-height:1}.galleryTools button:hover{background:#fff}.galleryTools [data-fullscreen]{padding-left:14px;padding-right:16px}.modalCounter{bottom:18px!important;}
+.modalGallery:fullscreen{width:100vw!important;height:100vh!important;min-height:100vh!important;border-radius:0!important;background:#10283a!important;}.modalGallery:fullscreen img{height:100%!important;}
+@media(max-width:900px){.modalBox{grid-template-columns:1fr!important;width:98vw!important}.modalGallery{min-height:68vh!important;border-radius:28px 28px 0 0!important}.galleryTools{top:12px;gap:5px}.galleryTools button{padding:8px 10px;font-size:12px}.galleryNav{width:42px;height:42px}.modalInfo{padding:24px 18px!important}}
+@media(max-width:520px){.modalGallery{min-height:58vh!important}.galleryTools [data-fullscreen]{font-size:0}.galleryTools [data-fullscreen]::after{content:'⛶';font-size:14px}.modalClose{right:10px;top:10px}}

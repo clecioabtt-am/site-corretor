@@ -2,7 +2,7 @@
 // Ajuste 2026-06-01: garante que a imagem do modal apareça completa, sem corte,
 // mesmo se algum CSS antigo ficar em cache no navegador.
 (function ensureModalImageContain(){
-  const css = `.modalGallery img,#modalImg{object-fit:contain!important;object-position:center center!important;background:#10283a!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:72vh!important;}`;
+  const css = `.modalGallery{min-height:82vh!important}.modalGallery img,#modalImg{object-fit:contain!important;object-position:center center!important;background:#10283a!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;}`;
   if(!document.getElementById('modalImageContainFix')){
     const style=document.createElement('style');
     style.id='modalImageContainFix';
@@ -30,6 +30,7 @@ const fallbackBairroImages={
 const money=n=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}).format(n||0);
 let activeGalleryIndex=0;
 let activeGalleryImages=[];
+let activeZoom=1;
 const escapeHtml=v=>String(v??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));
 
 async function loadSiteConfig(){
@@ -170,21 +171,59 @@ function ensurePropertyModal(){
   modal=document.createElement('div');
   modal.id='propertyModal';
   modal.className='propertyModal hidden';
-  modal.innerHTML=`<div class="modalBackdrop" data-close="1"></div><div class="modalBox"><button class="modalClose" data-close="1">×</button><div class="modalGallery"><button class="galleryNav prev" data-prev="1">‹</button><img id="modalImg" alt="Foto do imóvel"><button class="galleryNav next" data-next="1">›</button><div id="modalCounter" class="modalCounter"></div></div><div class="modalInfo"><small id="modalMeta"></small><h2 id="modalTitle"></h2><strong id="modalPrice"></strong><div id="modalDetails" class="modalDetails"></div><p id="modalEndereco" class="modalEndereco"></p><p id="modalDescription"></p><div class="modalActions"><a id="modalWhatsapp" class="primary" target="_blank" rel="noopener">Falar com o corretor no WhatsApp</a><button id="modalLocationBtn" class="locationBtn" type="button">📍 Ver localização</button></div><div id="mapBox" class="mapBox hidden"><iframe id="mapFrame" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe><a id="mapExternal" target="_blank">Abrir no Google Maps</a></div></div></div>`;
+  modal.innerHTML=`<div class="modalBackdrop" data-close="1"></div><div class="modalBox"><button class="modalClose" data-close="1">×</button><div class="modalGallery"><button class="galleryNav prev" data-prev="1">‹</button><img id="modalImg" alt="Foto do imóvel"><button class="galleryNav next" data-next="1">›</button><div class="galleryTools" aria-label="Controles da imagem"><button type="button" data-zoom-out="1" title="Diminuir zoom">−</button><button type="button" data-zoom-reset="1" title="Restaurar zoom">100%</button><button type="button" data-zoom-in="1" title="Aumentar zoom">+</button><button type="button" data-fullscreen="1" title="Tela cheia">⛶ Tela cheia</button></div><div id="modalCounter" class="modalCounter"></div></div><div class="modalInfo"><small id="modalMeta"></small><h2 id="modalTitle"></h2><strong id="modalPrice"></strong><div id="modalDetails" class="modalDetails"></div><p id="modalEndereco" class="modalEndereco"></p><p id="modalDescription"></p><div class="modalActions"><a id="modalWhatsapp" class="primary" target="_blank" rel="noopener">Falar com o corretor no WhatsApp</a><button id="modalLocationBtn" class="locationBtn" type="button">📍 Ver localização</button></div><div id="mapBox" class="mapBox hidden"><iframe id="mapFrame" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe><a id="mapExternal" target="_blank">Abrir no Google Maps</a></div></div></div>`;
   document.body.appendChild(modal);
   modal.addEventListener('click',e=>{
     if(e.target.dataset.close) closePropertyModal();
     if(e.target.dataset.prev) slideModal(-1);
     if(e.target.dataset.next) slideModal(1);
+    if(e.target.dataset.zoomIn) setModalZoom(activeZoom + .25);
+    if(e.target.dataset.zoomOut) setModalZoom(activeZoom - .25);
+    if(e.target.dataset.zoomReset) setModalZoom(1);
+    if(e.target.dataset.fullscreen) openModalFullscreen();
+    if(e.target.id==='modalImg') setModalZoom(activeZoom === 1 ? 1.5 : 1);
     if(e.target.id==='modalLocationBtn') toggleMapBox();
   });
-  document.addEventListener('keydown',e=>{ if(!modal.classList.contains('hidden')&&e.key==='Escape') closePropertyModal(); });
+  document.addEventListener('keydown',e=>{
+    if(modal.classList.contains('hidden')) return;
+    if(e.key==='Escape') closePropertyModal();
+    if(e.key==='ArrowLeft') slideModal(-1);
+    if(e.key==='ArrowRight') slideModal(1);
+    if(e.key==='+' || e.key==='=') setModalZoom(activeZoom + .25);
+    if(e.key==='-' || e.key==='_') setModalZoom(activeZoom - .25);
+  });
+  modal.querySelector('.modalGallery')?.addEventListener('wheel',e=>{
+    if(!e.ctrlKey) return;
+    e.preventDefault();
+    setModalZoom(activeZoom + (e.deltaY < 0 ? .15 : -.15));
+  },{passive:false});
   return modal;
 }
+
+function setModalZoom(value){
+  activeZoom=Math.min(3,Math.max(1,Number(value)||1));
+  const img=document.querySelector('#modalImg');
+  const resetBtn=document.querySelector('[data-zoom-reset]');
+  const gallery=document.querySelector('.modalGallery');
+  if(img){
+    img.style.width=(activeZoom*100)+'%';
+    img.style.height=(activeZoom*100)+'%';
+    img.style.cursor=activeZoom>1?'zoom-out':'zoom-in';
+  }
+  if(gallery) gallery.classList.toggle('zoomed',activeZoom>1);
+  if(resetBtn) resetBtn.textContent=Math.round(activeZoom*100)+'%';
+}
+function openModalFullscreen(){
+  const target=document.querySelector('.modalGallery') || document.querySelector('#propertyModal');
+  if(target?.requestFullscreen) target.requestFullscreen().catch(()=>{});
+  else if(target?.webkitRequestFullscreen) target.webkitRequestFullscreen();
+}
+
 function updateModalImage(){
   const img=document.querySelector('#modalImg');
   const counter=document.querySelector('#modalCounter');
   if(img) img.src=activeGalleryImages[activeGalleryIndex]||'';
+  setModalZoom(1);
   if(counter) counter.textContent=`${activeGalleryIndex+1}/${activeGalleryImages.length||1}`;
 }
 function slideModal(dir){
