@@ -57,6 +57,13 @@ async function loadSiteConfig(){
 
 const norm=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
 function isDisponivel(p){return ['disponivel','disponível'].includes(norm(p.status));}
+function isPublicStatus(p){return ['disponivel','disponivel','disponível','alugado','vendido'].includes(norm(p.status));}
+function statusClass(status){
+  const s=norm(status);
+  if(s==='alugado') return 'statusAlugado';
+  if(s==='vendido') return 'statusVendido';
+  return 'statusDisponivel';
+}
 function label(v){return String(v||'').trim();}
 function getImages(p){
   const imgs=[];
@@ -109,8 +116,8 @@ function mapsQuery(p){return [p.endereco,p.bairro,p.cidade||'Manaus','Amazonas',
 function mapsUrl(p){return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapsQuery(p))}`;}
 function render(list){
   const grid=document.querySelector('#propertyGrid'); if(!grid)return;
-  const visible=list.filter(isDisponivel);
-  grid.innerHTML=visible.map((p,i)=>`<article class="card propertyCard" data-id="${p.id||i}" tabindex="0" role="button" aria-label="Ver detalhes do imóvel ${escapeHtml(p.titulo||p.title||'')}"><div class="thumb" style="background-image:url('${propImg(p)}')"><span>${label(p.status)||'Disponível'}</span></div><div class="cardBody"><small>${label(p.bairro)} • ${label(p.cidade)||'Manaus'}</small><h3>${escapeHtml(p.titulo||p.title||'Imóvel sem título')}</h3><p>${label(p.tipo)||'Imóvel'} ${norm(p.finalidade)==='aluguel'?'para aluguel':'à venda'}, ${p.area||p.area_m2||0} m²</p><b>${money(p.valor||p.price)}</b><a class="whatsProperty" target="_blank" rel="noopener" href="${whatsappUrl(p)}">Falar com corretor</a></div></article>`).join('')||'<p class="empty">Nenhum imóvel disponível encontrado.</p>';
+  const visible=list.filter(isPublicStatus);
+  grid.innerHTML=visible.map((p,i)=>`<article class="card propertyCard" data-id="${p.id||i}" tabindex="0" role="button" aria-label="Ver detalhes do imóvel ${escapeHtml(p.titulo||p.title||'')}"><div class="thumb" style="background-image:url('${propImg(p)}')"><span class="${statusClass(p.status)}">${label(p.status)||'Disponível'}</span></div><div class="cardBody"><small>${label(p.bairro)} • ${label(p.cidade)||'Manaus'}</small><h3>${escapeHtml(p.titulo||p.title||'Imóvel sem título')}</h3><p>${label(p.tipo)||'Imóvel'} ${norm(p.finalidade)==='aluguel'?'para aluguel':'à venda'}, ${p.area||p.area_m2||0} m²</p><b>${money(p.valor||p.price)}</b><a class="whatsProperty" target="_blank" rel="noopener" href="${whatsappUrl(p)}">Falar com corretor</a></div></article>`).join('')||'<p class="empty">Nenhum imóvel encontrado.</p>';
   grid.querySelectorAll('.propertyCard').forEach(card=>{
     const id=card.dataset.id;
     const prop=visible.find((x,idx)=>String(x.id||idx)===String(id));
@@ -127,7 +134,7 @@ function createBairroCard(nome){
 }
 function renderBairros(items){
   const wrap=document.querySelector('#bairroGrid'); if(!wrap)return;
-  const disponíveis=items.filter(isDisponivel);
+  const disponíveis=items.filter(isPublicStatus);
   const nomesBanco=[...new Set(disponíveis.map(p=>label(p.bairro)).filter(Boolean))];
   const nomes=[...bairrosBase];
   nomesBanco.forEach(b=>{ if(!nomes.some(x=>bairroKey(x)===bairroKey(b))) nomes.push(b); });

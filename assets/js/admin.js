@@ -46,13 +46,29 @@ async function loadDash(){
     leadList.innerHTML=(leads||[]).map(l=>`<p><b>${l.nome}</b> - ${l.telefone} - ${l.tipo||''}</p>`).join('')||'<p>Nenhum lead.</p>';
   }catch(error){alert('Erro ao carregar painel: '+error.message)}
 }
-function normalizeStatus(s){return String(s||'disponivel').toLowerCase();}
+function normalizeStatus(s){return String(s||'disponivel').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();}
+function normalizeBairro(s){return String(s||'Sem bairro').trim() || 'Sem bairro';}
 function renderAdmin(items){
   stTotal.textContent=items.length;
   stDisp.textContent=items.filter(i=>normalizeStatus(i.status)==='disponivel').length;
   stVend.textContent=items.filter(i=>normalizeStatus(i.status)==='vendido').length;
   stAlug.textContent=items.filter(i=>normalizeStatus(i.status)==='alugado').length;
-  adminList.innerHTML=items.map(i=>`<div class="adminItem"><div><b>${i.titulo||'Sem título'}</b><span>${i.bairro||'Sem bairro'} • ${i.endereco||'Sem endereço'} • ${i.status||'disponivel'} • ${i.finalidade||''}</span></div><div class="adminActions"><button type="button" data-edit="${i.id}">Editar</button><button type="button" data-delete="${i.id}">Remover</button></div></div>`).join('')||'<p>Nenhum imóvel cadastrado ainda.</p>';
+
+  if(!items.length){
+    adminList.innerHTML='<p>Nenhum imóvel cadastrado ainda.</p>';
+    return;
+  }
+
+  const grupos=items.reduce((acc,item)=>{
+    const bairro=normalizeBairro(item.bairro);
+    (acc[bairro] ||= []).push(item);
+    return acc;
+  },{});
+
+  adminList.innerHTML=Object.entries(grupos)
+    .sort(([a],[b])=>a.localeCompare(b,'pt-BR'))
+    .map(([bairro,props])=>`<details class="adminBairroGroup" open><summary><b>${bairro}</b><span>${props.length} ${props.length===1?'imóvel cadastrado':'imóveis cadastrados'}</span></summary>${props.map(i=>`<div class="adminItem"><div><b>${i.titulo||'Sem título'}</b><span>${i.endereco||'Sem endereço'} • ${i.status||'disponivel'} • ${i.finalidade||''}</span></div><div class="adminActions"><button type="button" data-edit="${i.id}">Editar</button><button type="button" data-delete="${i.id}">Remover</button></div></div>`).join('')}</details>`)
+    .join('');
 }
 function fillForm(item){
   editingId=item.id;
