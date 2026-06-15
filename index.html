@@ -6,7 +6,7 @@
   <title>Arquipélago Imobiliária | Oclesio Araújo Jr</title>
   <meta name="description" content="Compre, alugue e anuncie imóveis em Manaus com Arquipélago Imobiliária e Oclesio Araújo Jr.">
   <link rel="preconnect" href="https://images.unsplash.com">
-  <link rel="stylesheet" href="assets/css/style.css?v=20260605-gallery-zoom">
+  <link rel="stylesheet" href="assets/css/style.css?v=20260615-premium-v2">
 </head>
 
 <body>
@@ -33,44 +33,35 @@
     <button class="menu" onclick="document.body.classList.toggle('open')">☰</button>
   </nav>
 
-  <section class="heroContent">
-    <div class="logoBig logoBigImage">
-      <img src="assets/img/logo-arquipelago.jpeg" alt="Arquipélago Imobiliária">
+  <section class="heroContent heroPremiumContent">
+    <div class="heroCopy">
+      <small class="eyebrow">Consultoria imobiliária premium em Manaus</small>
+      <h1>Encontre o imóvel certo para comprar ou alugar com segurança.</h1>
+      <p class="heroSubtitle">Curadoria profissional, atendimento direto com Oclésio Jr. e imóveis organizados por finalidade, bairro, valor e perfil de compra.</p>
+      <div class="heroActions">
+        <a class="primary goldBtn" href="#imoveis">Ver imóveis disponíveis</a>
+        <a class="outlineBtn" href="https://wa.me/5592982452810">Falar no WhatsApp</a>
+      </div>
+      <div class="trustLine">
+        <span>✓ Negociação segura</span>
+        <span>✓ Compra, venda e locação</span>
+        <span>✓ Especialista em Manaus</span>
+      </div>
     </div>
-
-    <h1>Especializado em imóveis residenciais e comerciais</h1>
-
-    <div class="toggle">
-      <button class="active" data-purpose="venda">Comprar</button>
-      <button data-purpose="aluguel">Alugar</button>
-    </div>
-
-    <form class="searchbar" id="heroSearch">
-      <select id="heroType">
-        <option value="">Tipo</option>
-        <option>Casa</option>
-        <option>Apartamento</option>
-        <option>Terreno</option>
-        <option>Sala Comercial</option>
-      </select>
-      <input id="heroText" placeholder="Procure por cidade, bairro, condomínio ou código">
-      <button>🔎</button>
-    </form>
+    <aside class="agentHeroCard">
+      <img src="assets/img/oclesio-araujo-jr.png" alt="Oclésio Jr. Corretor de Imóveis">
+      <h2>Oclésio Jr.</h2>
+      <p>Corretor de Imóveis<br><b>CRECI-AM 7423</b></p>
+      <a href="https://wa.me/5592982452810">💬 Atendimento pelo WhatsApp</a>
+    </aside>
   </section>
 </header>
 
 <main>
-<section class="stats-bar">
-<div class="stat-card"><h3>+500</h3><p>Clientes Atendidos</p></div>
-<div class="stat-card"><h3>+150</h3><p>Imóveis Negociados</p></div>
-<div class="stat-card"><h3>100%</h3><p>Atendimento Personalizado</p></div>
-<div class="stat-card"><h3>Manaus</h3><p>Especialista Local</p></div>
-</section>
-
-<section class="section glass-premium" style="padding:30px;margin:20px;">
-<h2>🏡 Encontre o imóvel ideal com Oclésio Jr.</h2>
-<p>Compra, venda e aluguel com atendimento consultivo, análise de financiamento e suporte completo até a entrega das chaves.</p>
-<a class="cta-premium" href="https://wa.me/5592982452810">Falar agora no WhatsApp</a>
+<section class="section premiumIntro">
+  <small>Experiência exclusiva</small>
+  <h2>Um site pensado para ajudar você a decidir melhor.</h2>
+  <p>Visual moderno, informações objetivas, filtros completos e contato rápido para transformar interesse em visita agendada.</p>
 </section>
 
   <section class="benefits">
@@ -96,25 +87,16 @@
       <h2>Imóveis em destaque</h2>
     </div>
 
-    <div class="filters">
-      <select id="filterPurpose">
-        <option value="">Finalidade</option>
-        <option value="venda">Venda</option>
-        <option value="aluguel">Aluguel</option>
-      </select>
-
-      <select id="filterType">
-        <option value="">Tipo</option>
-        <option>Casa</option>
-        <option>Apartamento</option>
-        <option>Terreno</option>
-        <option>Sala Comercial</option>
-      </select>
-
-      <input id="filterDistrict" placeholder="Bairro">
-      <input id="filterMax" type="number" placeholder="Valor máximo">
-      <button id="clearFilters">Limpar</button>
-    </div>
+    <form class="filters premiumFilter" id="mainFilter">
+      <div><label>Finalidade</label><select id="filterPurpose"><option value="">Comprar ou alugar</option><option value="venda">Comprar</option><option value="aluguel">Alugar</option></select></div>
+      <div><label>Tipo de imóvel</label><select id="filterType"><option value="">Todos os tipos</option><option>Casa</option><option>Apartamento</option><option>Terreno</option><option>Sala Comercial</option></select></div>
+      <div><label>Bairro</label><input id="filterDistrict" placeholder="Ex: Ponta Negra"></div>
+      <div><label>Dormitórios</label><select id="filterBedrooms"><option value="">Qualquer</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option></select></div>
+      <div><label>Status</label><select id="filterStatus"><option value="">Todos</option><option value="disponivel">Disponível</option><option value="alugado">Alugado</option><option value="vendido">Vendido</option></select></div>
+      <div><label>Valor máximo</label><input id="filterMax" type="number" placeholder="R$ máximo"></div>
+      <button type="submit" class="filterSearchBtn">🔎 Buscar imóveis</button>
+      <button type="button" id="clearFilters" class="filterCleanBtn">Limpar filtros</button>
+    </form>
 
     <div class="cards" id="propertyGrid"></div>
   </section>
@@ -215,6 +197,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/js/config.js"></script>
-<script src="assets/js/app.js?v=20260605-gallery-zoom"></script>
+<script src="assets/js/app.js?v=20260615-premium-v2"></script>
 </body>
 </html>

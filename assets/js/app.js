@@ -162,12 +162,19 @@ setInterval(()=>{
 },3500);
 function applyFilters(){
   let l=[...all];
-  const pur=norm(document.querySelector('#filterPurpose')?.value), typ=norm(document.querySelector('#filterType')?.value), bai=norm(document.querySelector('#filterDistrict')?.value), max=Number(document.querySelector('#filterMax')?.value||0);
-  if(pur)l=l.filter(p=>norm(p.finalidade)===pur); if(typ)l=l.filter(p=>norm(p.tipo)===typ); if(bai)l=l.filter(p=>bairroKey(p.bairro).includes(bai)); if(max)l=l.filter(p=>(p.valor||p.price||0)<=max); render(l)
+  const pur=norm(document.querySelector('#filterPurpose')?.value), typ=norm(document.querySelector('#filterType')?.value), bai=norm(document.querySelector('#filterDistrict')?.value), max=Number(document.querySelector('#filterMax')?.value||0), beds=Number(document.querySelector('#filterBedrooms')?.value||0), st=norm(document.querySelector('#filterStatus')?.value);
+  if(pur) l=l.filter(p=>norm(p.finalidade)===pur);
+  if(typ) l=l.filter(p=>norm(p.tipo)===typ);
+  if(bai) l=l.filter(p=>bairroKey(p.bairro).includes(bai));
+  if(max) l=l.filter(p=>(p.valor||p.price||0)<=max);
+  if(beds) l=l.filter(p=>Number(p.quartos||0)>=beds);
+  if(st) l=l.filter(p=>norm(p.status)===st || (st==='disponivel' && ['disponível','disponivel'].includes(norm(p.status))));
+  render(l);
 }
-['filterPurpose','filterType','filterDistrict','filterMax'].forEach(id=>document.addEventListener('input',e=>{if(e.target.id===id)applyFilters()}));
+['filterPurpose','filterType','filterDistrict','filterMax','filterBedrooms','filterStatus'].forEach(id=>document.addEventListener('input',e=>{if(e.target.id===id)applyFilters()}));
+document.querySelector('#mainFilter')?.addEventListener('submit',e=>{e.preventDefault();applyFilters();document.querySelector('#propertyGrid')?.scrollIntoView({behavior:'smooth',block:'start'});});
 document.querySelector('#clearFilters')?.addEventListener('click',()=>{document.querySelectorAll('.filters input,.filters select').forEach(x=>x.value=''); render(all)});
-document.querySelector('#heroSearch')?.addEventListener('submit',e=>{e.preventDefault();document.querySelector('#imoveis')?.scrollIntoView({behavior:'smooth'}); const t=document.querySelector('#filterType'); const d=document.querySelector('#filterDistrict'); if(t)t.value=document.querySelector('#heroType').value; if(d)d.value=document.querySelector('#heroText').value; applyFilters()});
+document.querySelector('#heroSearch')?.addEventListener('submit',e=>{e.preventDefault();document.querySelector('#imoveis')?.scrollIntoView({behavior:'smooth'}); const t=document.querySelector('#filterType'); const d=document.querySelector('#filterDistrict'); if(t)t.value=document.querySelector('#heroType')?.value||''; if(d)d.value=document.querySelector('#heroText')?.value||''; applyFilters()});
 function calc(){const price=+priceRange.value, down=+downRange.value/100, rate=(+rateRange.value/100)/12, months=+yearsRange.value*12, financed=price*(1-down); const parcel=financed*(rate*Math.pow(1+rate,months))/(Math.pow(1+rate,months)-1); priceLabel.textContent=money(price);downLabel.textContent=Math.round(down*100)+'%';rateLabel.textContent=rateRange.value+'% /ano';yearsLabel.textContent=yearsRange.value+' anos';parcelValue.textContent=money(parcel)+'/mês'}
 ['priceRange','downRange','rateRange','yearsRange'].forEach(id=>document.querySelector('#'+id)?.addEventListener('input',calc)); if(document.querySelector('#priceRange'))calc();
 document.querySelector('#leadForm')?.addEventListener('submit',async e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target)); try{if(db) await db.from('leads').insert(f); alert('Dados enviados com sucesso!')}catch(err){alert('Recebemos seu interesse. Configure o Supabase para salvar online.')} e.target.reset()});
