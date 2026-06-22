@@ -278,4 +278,24 @@ function closePropertyModal(){
   document.body.classList.remove('modalOpen');
 }
 
+registerSiteVisit();
+
+// Analytics simples de visitas do site
+// Registra uma visita por sessão do navegador e salva informações úteis no Supabase.
+async function registerSiteVisit(){
+  if(!db) return;
+  try{
+    const sessionKey='arquipelago_visit_registered';
+    if(sessionStorage.getItem(sessionKey)) return;
+    sessionStorage.setItem(sessionKey,'1');
+    const referrer=document.referrer || '';
+    const source=referrer ? (()=>{try{return new URL(referrer).hostname.replace(/^www\./,'')}catch(_){return 'Referência externa'}})() : 'Acesso direto';
+    const timezone=Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+    const language=navigator.language || '';
+    const page_path=location.pathname || '/';
+    const user_agent=navigator.userAgent || '';
+    await db.from('site_visits').insert({source,referrer,timezone,language,page_path,user_agent});
+  }catch(e){console.warn('Visita não registrada:',e.message)}
+}
+
 loadSiteConfig().finally(loadProperties);

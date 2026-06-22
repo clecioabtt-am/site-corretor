@@ -142,3 +142,23 @@ drop policy if exists "Admin update imoveis storage" on storage.objects;
 create policy "Admin update imoveis storage" on storage.objects for update using (auth.role()='authenticated' and bucket_id = 'imoveis');
 drop policy if exists "Admin delete imoveis storage" on storage.objects;
 create policy "Admin delete imoveis storage" on storage.objects for delete using (auth.role()='authenticated' and bucket_id = 'imoveis');
+
+-- Analytics simples de visitantes do site
+create table if not exists public.site_visits (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz default now(),
+  source text,
+  referrer text,
+  timezone text,
+  language text,
+  page_path text,
+  user_agent text
+);
+
+alter table public.site_visits enable row level security;
+
+drop policy if exists "Public insert site visits" on public.site_visits;
+create policy "Public insert site visits" on public.site_visits for insert with check (true);
+
+drop policy if exists "Authenticated read site visits" on public.site_visits;
+create policy "Authenticated read site visits" on public.site_visits for select using (auth.role()='authenticated');

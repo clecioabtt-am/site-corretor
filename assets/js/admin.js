@@ -44,6 +44,7 @@ async function loadDash(){
     await loadSettings();
     const {data:leads}=await sb.from('leads').select('*').order('created_at',{ascending:false});
     leadList.innerHTML=(leads||[]).map(l=>`<p><b>${l.nome}</b> - ${l.telefone} - ${l.tipo||''}</p>`).join('')||'<p>Nenhum lead.</p>';
+    await loadAnalytics();
   }catch(error){alert('Erro ao carregar painel: '+error.message)}
 }
 function normalizeStatus(s){return String(s||'disponivel').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();}
@@ -217,6 +218,51 @@ settingsForm.addEventListener('submit',async e=>{
   alert('Configurações salvas!');
   await loadSettings();
 });
+
+async function loadAnalytics(){
+  const totalEl=$('visitTotal'), todayEl=$('visitToday'), days7El=$('visit7Days'), days30El=$('visit30Days');
+  const sourcesEl=$('visitSources'), locationsEl=$('visitLocations');
+  if(!totalEl || !sourcesEl || !locationsEl) return;
+  const now=new Date();
+  const startToday=new Date(now.getFullYear(),now.getMonth(),now.getDate()).toISOString();
+  const start7=new Date(now.getTime()-7*24*60*60*1000).toISOString();
+  const start30=new Date(now.getTime()-30*24*60*60*1000).toISOString();
+  try{
+    const [total,today,last7,last30,recent]=await Promise.all([
+      sb.from('site_visits').select('id',{count:'exact',head:true}),
+      sb.from('site_visits').select('id',{count:'exact',head:true}).gte('created_at',startToday),
+      sb.from('site_visits').select('id',{count:'exact',head:true}).gte('created_at',start7),
+      sb.from('site_visits').select('id',{count:'exact',head:true}).gte('created_at',start30),
+      sb.from('site_visits').select('source,timezone,language,created_at').order('created_at',{ascending:false}).limit(500)
+    ]);
+    for(const r of [total,today,last7,last30,recent]) if(r.error) throw r.error;
+    totalEl.textContent=total.count||0;
+    todayEl.textContent=today.count||0;
+    days7El.textContent=last7.count||0;
+    days30El.textContent=last30.count||0;
+    const rows=recent.data||[];
+    renderAnalyticsList(sourcesEl,countBy(rows.map(v=>v.source||'Acesso direto')),'origem');
+    renderAnalyticsList(locationsEl,countBy(rows.map(v=>formatVisitorLocation(v))),'local');
+  }catch(error){
+    const msg='Não foi possível carregar visitantes. Rode o SQL atualizado em supabase/supabase-corrigir-banco.sql no Supabase.';
+    sourcesEl.innerHTML=`<p class="analyticsError">${msg}<br><small>${error.message||''}</small></p>`;
+    locationsEl.innerHTML='<p class="analyticsError">Aguardando configuração da tabela site_visits.</p>';
+  }
+}
+function countBy(values){
+  return values.reduce((acc,val)=>{const key=String(val||'Não informado'); acc[key]=(acc[key]||0)+1; return acc;},{});
+}
+function renderAnalyticsList(el,map,label){
+  const entries=Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  el.innerHTML=entries.length?entries.map(([name,total])=>`<div class="analyticsRow"><span>${escapeAdminHtml(name)}</span><b>${total}</b></div>`).join(''):`<p>Nenhuma ${label} registrada ainda.</p>`;
+}
+function formatVisitorLocation(v){
+  const tz=v.timezone||'Fuso não informado';
+  const lang=v.language?` • ${v.language}`:'';
+  return `${tz}${lang}`;
+}
+function escapeAdminHtml(v){return String(v??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));}
+
 init();
 
 // Pesquisa inteligente: busca interna no Supabase + links externos sem API
